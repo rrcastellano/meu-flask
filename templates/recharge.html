@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2>Registrar Recarga</h2>
+<form method="POST" action="/recharge">
+  {{ form.hidden_tag() }}
+  <div class="mb-3">
+    <label for="data" class="form-label">Data</label>
+    {{ form.data(class_='form-control', id='data') }}
+  </div>
+  <div class="mb-3">
+    <label for="kwh" class="form-label">kWh Carregados</label>
+    {{ form.kwh(class_='form-control', id='kwh') }}
+  </div>
+  <div class="mb-3">
+    <label for="custo" class="form-label">Custo (R$)</label>
+    {{ form.custo(class_='form-control', id='custo') }}
+  </div>
+  <div class="mb-3">
+    <label for="odometro" class="form-label">Odômetro (km)</label>
+    {{ form.odometro(class_='form-control', id='odometro') }}
+  </div>
+  <div class="mb-3">
+    <label for="local" class="form-label">Local</label>
+    {{ form.local(class_='form-control', id='local') }}
+  </div>
+  <div class="mb-3">
+    <label for="observacoes" class="form-label">Observações</label>
+    {{ form.observacoes(class_='form-control', id='observacoes') }}
+  </div>
+  <button type="submit" class="btn btn-success">Salvar</button>
+</form>
+{% endblock %}

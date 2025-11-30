@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2>Configurações da Conta</h2>
+<form method="POST" action="/account">
+  {{ form.hidden_tag() }}
+  <div class="mb-3">
+    <label for="preco_gasolina" class="form-label">Preço da Gasolina (R$/litro)</label>
+    {{ form.preco_gasolina(class_='form-control', id='preco_gasolina') }}
+  </div>
+  <div class="mb-3">
+    <label for="consumo_km_l" class="form-label">Consumo Médio (km/l)</label>
+    {{ form.consumo_km_l(class_='form-control', id='consumo_km_l') }}
+  </div>
+  <button type="submit" class="btn btn-primary">Salvar Configurações</button>
+</form>
+{% endblock %}
