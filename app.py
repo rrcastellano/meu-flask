@@ -12,7 +12,11 @@ import io
 import os
 
 app = Flask(__name__)
-app.secret_key = "supersecretkey"  # TODO: usar variável de ambiente em produção
+#app.secret_key = "supersecretkey"  # TODO: usar variável de ambiente em produção
+
+# Usa variável de ambiente em produção, com fallback para desenvolvimento
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key")
+
 csrf = CSRFProtect(app)
 
 login_manager = LoginManager(app)
