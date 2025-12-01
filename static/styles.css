@@ -1,13 +1,147 @@
-/* Estilos básicos */
-body { font-family: Arial, sans-serif; }
+
+/* ===== Estilos básicos ===== */
+body {
+  font-family: Arial, sans-serif;
+}
+
 /* Ajustes para tema Lux */
 .container h2, .container h4, .container h5 {
   margin-top: 0.5rem;
   margin-bottom: 1rem;
 }
+
 .navbar-brand {
   font-weight: 600;
   letter-spacing: 0.2px;
 }
-footer { color: #6c757d; }
-.alert { box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.08); }
+
+footer {
+  color: #6c757d;
+}
+
+.alert {
+  box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.08);
+}
+
+/* ===== KPIs ===== */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.kpi-card {
+  position: relative;
+  background: #fff;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-4px);
+}
+
+.kpi-card i {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.kpi-card h6 {
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 0.3rem;
+}
+
+.kpi-card p {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Ícone de informação (popover trigger) */
+.kpi-info {
+  position: absolute;
+  right: 0.5rem;
+  top: 0.5rem;
+  color: #888;
+  cursor: help;
+  font-size: 1rem;
+}
+
+.kpi-info:hover {
+  color: #555;
+}
+
+/* Cores por categoria */
+.kpi-quantidade i { color: #0d6efd; } /* Azul */
+.kpi-custo i { color: #198754; }      /* Verde */
+.kpi-consumo i { color: #ffc107; }    /* Amarelo */
+.kpi-economia i { color: #fd7e14; }   /* Laranja */
+
+/* ===== Indicadores de tendência ===== */
+.kpi-trend {
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.kpi-trend.up { color: #198754; }    /* verde */
+.kpi-trend.down { color: #dc3545; }  /* vermelho */
+.kpi-trend.flat { color: #6c757d; }  /* cinza */
+
+.kpi-trend .value {
+  font-weight: 600;
+}
+
+/* ===== Grid para gráficos do dashboard ===== */
+.dashboard-charts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.chart-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chart-card h6 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  color: #333;
+}
+
+.chart-container {
+  width: 100%;
+  height: 300px;
+  position: relative;
+}
+
+/* ===== Responsividade ===== */
+@media (max-width: 992px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .dashboard-charts {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}

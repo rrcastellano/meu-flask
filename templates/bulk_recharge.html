@@ -10,7 +10,7 @@
         {{ form.file(class_='form-control', id='file') }}
         <div class="form-text">
             O arquivo deve conter as colunas:
-            <strong>data, kwh, custo, odometro, local, observacoes</strong>
+            <strong>data, kwh, custo, isento, odometro, local, observacoes</strong>
         </div>
     </div>
     <button type="submit" class="btn btn-primary">Importar</button>
@@ -21,11 +21,11 @@
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Exemplo de CSV</h5>
-        <pre class="mb-0"><code>data,kwh,custo,odometro,local,observacoes
-2025-11-01,20.5,15.00,12000,Estação A,Recarga rápida
-2025-11-10,18.0,13.50,12250,Estação B,Recarga normal
-2025-11-20,22.3,16.75,12500,Estação C,Recarga completa
-2025-11-25,19.8,14.90,12750,Estação D,Recarga parcial
+        <pre class="mb-0"><code>data,kwh,custo,isento,odometro,local,observacoes
+2025-11-01,20.5,15.00,TRUE,12000,Estação A,Recarga rápida
+2025-11-10,18.0,13.50,FALSE,12250,Estação B,Recarga normal
+2025-11-20,22.3,16.75,TRUE,12500,Estação C,Recarga completa
+2025-11-25,19.8,14.90,FALSE,12750,Estação D,Recarga parcial
 </code></pre>
     </div>
 </div>

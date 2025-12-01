@@ -1,0 +1,196 @@
+
+(async function () {
+  // Busca dados agregados por mês
+  let apiData;
+  try {
+    const res = await fetch("{{ url_for('api_recharges_monthly') }}");
+    apiData = await res.json();
+  } catch (err) {
+    console.error("Falha ao carregar dados mensais:", err);
+    document.querySelectorAll('.chart-container').forEach(el => {
+      el.innerHTML = '<div class="text-muted">Não foi possível carregar os dados.</div>';
+    });
+    return;
+  }
+
+  // Se não houver dados
+  if (!apiData || !apiData.labels || apiData.labels.length === 0) {
+    document.querySelectorAll('.chart-container').forEach(el => {
+      el.innerHTML = '<div class="text-muted">Sem dados para exibir.</div>';
+    });
+    return;
+  }
+
+  // Converte "YYYY-MM" -> "MM/YYYY"
+  const labels = apiData.labels.map(m => `${m.slice(5, 7)}/${m.slice(0, 4)}`);
+
+  // Helpers de formatação
+  const fmtBRL = v => 'R$ ' + Number(v ?? 0).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  const fmtNum = v => Number(v ?? 0).toLocaleString('pt-BR', {maximumFractionDigits: 2});
+
+  // ============ Gráfico 1: Custos por Mês ============ //
+  new Chart(document.getElementById('chartCustos'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Custo Total (R$)',
+          data: apiData.custos.total,
+          backgroundColor: 'rgba(13,110,253,0.6)',
+          borderColor: 'rgba(13,110,253,1)',
+          borderWidth: 1,
+          yAxisID: 'y'
+        },
+        {
+          label: 'Recargas Pagas (R$)',
+          data: apiData.custos.pagas,
+          backgroundColor: 'rgba(25,135,84,0.6)',
+          borderColor: 'rgba(25,135,84,1)',
+          borderWidth: 1,
+          yAxisID: 'y'
+        },
+        {
+          type: 'line',
+          label: '% Pagas sobre Total',
+          data: apiData.custos.percentual,
+          borderColor: 'rgba(255,193,7,1)',
+          backgroundColor: 'rgba(255,193,7,0.2)',
+          tension: 0.25,
+          pointRadius: 3,
+          yAxisID: 'yPerc'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        y: {
+          position: 'left',
+          title: { display: true, text: 'R$' },
+          ticks: { callback: value => fmtBRL(value) },
+          beginAtZero: true
+        },
+        yPerc: {
+          position: 'right',
+          title: { display: true, text: '%' },
+          ticks: { callback: value => value + '%' },
+          beginAtZero: true,
+          suggestedMax: 100,
+          grid: { drawOnChartArea: false }
+        }
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const dsLabel = ctx.dataset.label || '';
+              const v = ctx.raw;
+              return ctx.dataset.yAxisID === 'yPerc'
+                ? `${dsLabel}: ${v}%`
+                : `${dsLabel}: ${fmtBRL(v)}`;
+            }
+          }
+        },
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+
+  // ============ Gráfico 2: Consumo por Mês (kWh) ============ //
+  new Chart(document.getElementById('chartConsumo'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'kWh no mês',
+        data: apiData.consumo,
+        backgroundColor: 'rgba(255,193,7,0.6)',
+        borderColor: 'rgba(255,193,7,1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          title: { display: true, text: 'kWh' },
+          ticks: { callback: value => fmtNum(value) },
+          beginAtZero: true
+        }
+      },
+      plugins: {
+        tooltip: { callbacks: { label: c => `${c.dataset.label}: ${fmtNum(c.raw)} kWh` } },
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+
+  // ============ Gráfico 3: Km Rodados por Mês ============ //
+  new Chart(document.getElementById('chartKm'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Km no mês',
+        data: apiData.km,
+        backgroundColor: 'rgba(33,37,41,0.6)',
+        borderColor: 'rgba(33,37,41,1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          title: { display: true, text: 'Km' },
+          ticks: { callback: value => fmtNum(value) },
+          beginAtZero: true
+        }
+      },
+      plugins: {
+        tooltip: { callbacks: { label: c => `${c.dataset.label}: ${fmtNum(c.raw)} km` } },
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+
+  // ============ Gráfico 4: Valores Economizados por Mês ============ //
+  new Chart(document.getElementById('chartEconomia'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Economia Total (R$)',
+          data: apiData.economia.total,
+          backgroundColor: 'rgba(253,126,20,0.6)',
+          borderColor: 'rgba(253,126,20,1)',
+          borderWidth: 1
+        },
+        {
+          label: 'Economia (Pagas) (R$)',
+          data: apiData.economia.pagas,
+          backgroundColor: 'rgba(108,117,125,0.6)',
+          borderColor: 'rgba(108,117,125,1)',
+          borderWidth: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          title: { display: true, text: 'R$' },
+          ticks: { callback: value => fmtBRL(value) },
+          beginAtZero: true
+        }
+      },
+      plugins: {
+        tooltip: { callbacks: { label: c => `${c.dataset.label}: ${fmtBRL(c.raw)}` } },
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+})();
