@@ -93,82 +93,160 @@ app.jinja_env.filters["brl"] = brl
 
 
 # ----------------- FUNÇÃO AUXILIAR PARA CSV -----------------
+
+import csv
+import io
+from werkzeug.utils import secure_filename
+
 def validate_csv_and_parse(file_storage):
+    """
+    Valida e faz parse de um CSV enviado via upload (Flask/Werkzeug).
+    - Suporta UTF-8 / Latin-1
+    - Remove BOM
+    - Abre stream com newline='' (recomendação oficial do csv)
+    - Tenta detectar delimitador automaticamente (Sniffer)
+    - Mensagens de erro amigáveis
+    """
     err_msgs = []
     rows_validos = []
+
+    # --- sanity check do arquivo ---
     filename = secure_filename(file_storage.filename or "")
     if not filename.lower().endswith(".csv"):
         err_msgs.append("Formato inválido. Envie um arquivo .csv.")
         return [], err_msgs
+
     try:
+        # Reposiciona ponteiro e lê bytes
+        file_storage.stream.seek(0)
         raw = file_storage.read()
-        try:
-            text = raw.decode("utf-8")
-        except UnicodeDecodeError:
-            text = raw.decode("latin-1")
-        stream = io.StringIO(text)
-        reader = csv.DictReader(stream)
     except Exception as e:
         err_msgs.append(f"Erro ao ler o arquivo: {e}")
         return [], err_msgs
-    
-    reader = csv.DictReader(stream)
+
+    # --- decodificação com fallback ---
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        try:
+            text = raw.decode("latin-1")
+        except Exception as e:
+            err_msgs.append(f"Erro de encoding: {e}")
+            return [], err_msgs
+
+    # Remove BOM se existir
+    if text and text[0] == "\ufeff":
+        text = text[1:]
+
+    # Cria stream **com newline=''** (resolve o erro do csv)
+    stream = io.StringIO(text, newline='')
+
+    # --- detectar delimitador automaticamente ---
+    # Usamos um "sample" razoável para o Sniffer
+    sample = text[:10000]  # 10KB devem bastar
+    delimiter = ','
+    try:
+        dialect = csv.Sniffer().sniff(sample, delimiters=[',', ';', '\t', '|'])
+        delimiter = dialect.delimiter
+    except Exception:
+        # fallback: tenta detectar cabeçalho pela primeira linha
+        first_line = text.splitlines()[0] if text.splitlines() else ""
+        if ';' in first_line and ',' not in first_line:
+            delimiter = ';'
+        elif '\t' in first_line:
+            delimiter = '\t'
+        # senão mantém ','
+
+    # --- cria o DictReader com delimitador detectado ---
+    try:
+        reader = csv.DictReader(stream, delimiter=delimiter)
+    except Exception as e:
+        err_msgs.append(f"Erro ao preparar o leitor CSV: {e}")
+        return [], err_msgs
+
+    # Normaliza cabeçalhos
     if not reader.fieldnames:
         err_msgs.append("Arquivo CSV sem cabeçalho.")
         return [], err_msgs
 
-    # Remove BOM e espaços
-    reader.fieldnames = [h.strip().lower().replace('\ufeff', '') for h in reader.fieldnames]
+    reader.fieldnames = [
+        (h or "").strip().lower().replace('\ufeff', '')
+        for h in reader.fieldnames
+    ]
 
     required_headers = ['data', 'kwh', 'custo', 'isento', 'odometro', 'local', 'observacoes']
-    if not reader.fieldnames:
-        err_msgs.append("Arquivo CSV sem cabeçalho.")
-        return [], err_msgs
     missing = [h for h in required_headers if h not in reader.fieldnames]
     if missing:
-        err_msgs.append("Cabeçalhos inválidos. Esperado: " + ", ".join(required_headers))
+        err_msgs.append("Cabeçalhos inválidos.")
+        err_msgs.append("Esperado: " + ", ".join(required_headers))
         err_msgs.append("Ausentes: " + ", ".join(missing))
         return [], err_msgs
 
-    line_num = 1
+    # --- percorre linhas com validação robusta ---
+    line_num = 1  # começa após o header
     for row in reader:
         line_num += 1
+
+        # pula linhas completamente vazias
         if all((row.get(h) is None or str(row.get(h)).strip() == "") for h in required_headers):
             continue
+
         try:
             data = (row.get('data') or "").strip()
-            kwh = float(row.get('kwh'))
-            custo = float(row.get('custo'))
-            odometro = float(row.get('odometro'))
+            if not data:
+                raise ValueError("Campo 'data' vazio.")
+
+            # kwh
+            kwh_raw = (row.get('kwh') or "").strip().replace(',', '.')
+            if kwh_raw == "":
+                raise ValueError("Campo 'kwh' vazio.")
+            kwh = float(kwh_raw)
+            if kwh <= 0:
+                raise ValueError("kWh deve ser > 0.")
+
+            # custo
+            custo_raw = (row.get('custo') or "").strip().replace(',', '.')
+            if custo_raw == "":
+                raise ValueError("Campo 'custo' vazio.")
+            custo = float(custo_raw)
+            if custo < 0:
+                raise ValueError("Custo deve ser >= 0.")
+
+            # odômetro
+            odometro_raw = (row.get('odometro') or "").strip().replace(',', '.')
+            if odometro_raw == "":
+                raise ValueError("Campo 'odômetro' vazio.")
+            odometro = float(odometro_raw)
+            if odometro < 0:
+                raise ValueError("Odômetro deve ser >= 0.")
+
             local = (row.get('local') or "").strip()
             observacoes = (row.get('observacoes') or "").strip()
 
+            # booleano isento
             isento_raw = (row.get('isento') or "").strip().lower()
-            # Conversão para booleano
-            isento = isento_raw in ["true", "1", "sim", "yes"]
+            isento = isento_raw in ["true", "1", "sim", "yes", "y"]
 
-            if not data:
-                raise ValueError("Campo 'data' vazio.")
-            if kwh <= 0:
-                raise ValueError("kWh deve ser > 0.")
-            if custo < 0:
-                raise ValueError("Custo deve ser >= 0.")
-            if odometro < 0:
-                raise ValueError("Odômetro deve ser >= 0.")
             rows_validos.append({
                 'data': data,
                 'kwh': kwh,
                 'custo': custo,
                 'odometro': odometro,
-                'isento': isento,  # ✅ Campo adicionado
+                'isento': isento,
                 'local': local,
                 'observacoes': observacoes
             })
+
+        except ValueError as ve:
+            err_msgs.append(f"Linha {line_num}: {ve}. Conteúdo: {row}")
         except Exception as e:
-            err_msgs.append(f"Linha {line_num}: {e}. Conteúdo: {row}")
+            err_msgs.append(f"Linha {line_num}: erro inesperado: {e}. Conteúdo: {row}")
+
     if not rows_validos and not err_msgs:
         err_msgs.append("Nenhuma linha válida foi encontrada no CSV.")
+
     return rows_validos, err_msgs
+
 
 # ----------------- ROTAS -----------------
 @app.route("/")
