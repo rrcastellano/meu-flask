@@ -217,6 +217,7 @@ document.getElementById('btn-confirm-delete').addEventListener('click', async ()
 
 
 // ==================== Botão Exportar CSV ====================    
+/*
 document.addEventListener('DOMContentLoaded', () => {
     const btnExport = document.getElementById('btn-export');
     if (!btnExport) return; // evita erro se o botão não existir
@@ -233,6 +234,29 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = `/export_recharges?${params.toString()}`;
     });
 });
+*/
+
+document.addEventListener('DOMContentLoaded', () => {
+  const btnExport = document.getElementById('btn-export');
+  if (!btnExport) return;
+
+  btnExport.setAttribute('type', 'button'); // evita submit do form
+  btnExport.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    const getVal = (id) => document.getElementById(id)?.value || '';
+    const params = new URLSearchParams({
+      local:       getVal('filter-local'),
+      observacoes: getVal('filter-observacoes'),
+      isento:      getVal('filter-isento') || 'all',
+      date_from:   getVal('filter-date-from'),
+      date_to:     getVal('filter-date-to')
+    });
+
+    window.location.href = `/export_recharges?${params.toString()}`;
+  });
+});
+
 
 // ==================== Inicialização ====================
 document.addEventListener('DOMContentLoaded', () => {

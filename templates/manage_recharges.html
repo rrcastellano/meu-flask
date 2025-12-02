@@ -1,80 +1,107 @@
 
 {% extends "layout.html" %}
 {% block content %}
-<div class="container mt-4">
-    <h2>Gerenciar Recargas</h2>
-
-    <!-- Barra de filtros -->
-    <div class="filters-bar mb-4">
-        <form id="filters-form" class="row g-3">
-            <div class="col-md-3">
-                <label for="filter-local" class="form-label">Local</label>
-                <input type="text" id="filter-local" name="local" class="form-control" placeholder="Ex.: Shopping">
-            </div>
-            <div class="col-md-3">
-                <label for="filter-observacoes" class="form-label">Observações</label>
-                <input type="text" id="filter-observacoes" name="observacoes" class="form-control" placeholder="Ex.: garagem">
-            </div>
-            <div class="col-md-2">
-                <label for="filter-isento" class="form-label">Isento</label>
-                <select id="filter-isento" name="isento" class="form-select">
-                    <option value="all">Todos</option>
-                    <option value="true">Sim</option>
-                    <option value="false">Não</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label for="filter-date-from" class="form-label">Data início</label>
-                <input type="date" id="filter-date-from" name="date_from" class="form-control">
-            </div>
-            <div class="col-md-2">
-                <label for="filter-date-to" class="form-label">Data fim</label>
-                <input type="date" id="filter-date-to" name="date_to" class="form-control">
-            </div>
-            <div class="col-12 d-flex gap-2 mt-2">
-                <button type="button" id="btn-apply-filters" class="btn btn-primary">Aplicar filtros</button>
-                <button type="button" id="btn-clear-filters" class="btn btn-secondary">Limpar</button>
-                <button type="button" id="btn-last-30-days" class="btn btn-outline-info">Últimos 30 dias</button>                
-                <button class="btn btn-success" id="btn-export"><i class="fa fa-file-csv"></i> Exportar CSV</button>
-            </div>
-        </form>
+<div class="container-fluid">
+    <h2 class="page-title mb-4"><i class="fa fa-list-alt me-2"></i> Gerenciar Recargas</h2>
+    <!-- Card de Filtros -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <i class="fa fa-filter"></i> Filtros
+        </div>
+        <div class="card-body">
+            <form id="filters-form" class="row g-3">
+                <div class="col-md-3">
+                    <label for="filter-local" class="form-label">Local</label>
+                    <input type="text" id="filter-local" name="local" class="form-control" placeholder="Ex.: Shopping">
+                </div>
+                <div class="col-md-3">
+                    <label for="filter-observacoes" class="form-label">Observações</label>
+                    <input type="text" id="filter-observacoes" name="observacoes" class="form-control" placeholder="Ex.: garagem">
+                </div>
+                <div class="col-md-2">
+                    <label for="filter-isento" class="form-label">Isento</label>
+                    <select id="filter-isento" name="isento" class="form-select">
+                        <option value="all">Todos</option>
+                        <option value="true">Sim</option>
+                        <option value="false">Não</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="filter-date-from" class="form-label">Data início</label>
+                    <input type="date" id="filter-date-from" name="date_from" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <label for="filter-date-to" class="form-label">Data fim</label>
+                    <input type="date" id="filter-date-to" name="date_to" class="form-control">
+                </div>
+                <div class="col-12 d-flex justify-content-end gap-2 mt-3">
+                    <button type="button" id="btn-apply-filters" class="btn btn-primary">
+                        <i class="fa fa-search"></i> Aplicar filtros
+                    </button>
+                    <button type="button" id="btn-clear-filters" class="btn btn-secondary">
+                        <i class="fa fa-eraser"></i> Limpar
+                    </button>
+                    <button type="button" id="btn-last-30-days" class="btn btn-outline-info">
+                        <i class="fa fa-clock"></i> Últimos 30 dias
+                    </button>
+                    <button type="button" id="btn-export" class="btn btn-success">
+                        <i class="fa fa-file-csv"></i> Exportar CSV
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <!-- Tabela de recargas -->
-    <div class="table-responsive">
-        <table class="table table-striped table-hover" id="recharges-table">
-            <thead>
-                <tr>
-                    <th data-sort="data">Data <span class="sort-icon"></span></th>
-                    <th data-sort="kwh">kWh <span class="sort-icon"></span></th>
-                    <th data-sort="custo">Custo <span class="sort-icon"></span></th>
-                    <th data-sort="isento">Isento <span class="sort-icon"></span></th>
-                    <th data-sort="odometro">Odômetro <span class="sort-icon"></span></th>
-                    <th data-sort="local">Local <span class="sort-icon"></span></th>
-                    <th data-sort="observacoes">Observações <span class="sort-icon"></span></th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="recharges-body"></tbody>
-        </table>
+    <!-- Spinner -->
+    <div id="loading-spinner" class="text-center my-3" style="display:none;">
+        <div class="spinner-border text-primary" role="status"></div>
+    </div>
+
+    <!-- Tabela -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <i class="fa fa-list"></i> Histórico de Recargas
+        </div>
+        <div class="card-body p-0">
+            <table id="recharges-table" class="table table-striped table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th data-sort="data">Data</th>
+                        <th data-sort="kwh">kWh</th>
+                        <th data-sort="custo">Custo</th>
+                        <th data-sort="isento">Isento</th>
+                        <th data-sort="odometro">Odômetro</th>
+                        <th data-sort="local">Local</th>
+                        <th data-sort="observacoes">Observações</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="recharges-body"></tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Paginação -->
     <div class="d-flex justify-content-between align-items-center mt-3">
-        <div id="pagination-info">Exibindo 1–20 de 0</div>
-        <div class="btn-group">
-            <button id="btn-prev-page" class="btn btn-outline-secondary" disabled>Anterior</button>
-            <button id="btn-next-page" class="btn btn-outline-secondary">Próximo</button>
+        <span id="pagination-info" class="badge bg-light text-dark">Exibindo 1–20 de 0</span>
+        <div>
+            <button id="btn-prev-page" class="btn btn-outline-primary btn-sm">
+                <i class="fa fa-chevron-left"></i> Anterior
+            </button>
+            <button id="btn-next-page" class="btn btn-outline-primary btn-sm">
+                Próximo <i class="fa fa-chevron-right"></i>
+            </button>
         </div>
     </div>
+
 </div>
 
 <!-- Modal de edição -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Editar Recarga</h5>
+            <div class="modal-header bg-warning text-white">
+                <h-title" id="editModalLabel"><i class="fa fa-edit"></i> Editar Recarga</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body">
@@ -82,7 +109,7 @@
                     <input type="hidden" id="edit-id">
                     <div class="row g-3">
                         <div class="col-md-4">
-                            <label for="edit-data" class="form-label">Data *</label>
+                            <label for="edit-data" class="formData *</label>
                             <input type="date" id="edit-data" name="data" class="form-control" required>
                             <div class="invalid-feedback">Informe uma data válida.</div>
                         </div>
@@ -128,8 +155,8 @@
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Confirmar Exclusão</h5>
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel"><i class="fa fa-trash"></i> Confirmar Exclusão</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body">

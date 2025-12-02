@@ -1,3 +1,88 @@
+/* ===== Tema Dark Clean EVChargeLog ===== */
+:root {
+  --green-dark: #0F6634;
+  --green-light: #77C556;
+  --white: #FFFFFF;
+  --text-muted: #CDE8D2;
+  --bg-dark: #0A0F0C;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--white);
+  font-family: 'Nunito Sans', sans-serif;
+}
+
+.navbar {
+  background-color: var(--green-dark);
+}
+.navbar .nav-link {
+  color: var(--white);
+}
+.navbar .nav-link:hover {
+  color: var(--green-light);
+}
+
+footer {
+  background-color: var(--green-dark);
+  color: var(--text-muted);
+}
+
+.card, .chart-card {
+  background-color: #0F1A13;
+  color: var(--white);
+  border: 1px solid rgba(119,197,86,0.2);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.card-header {
+  background-color: var(--green-dark);
+  color: var(--white);
+}
+
+.btn-primary {
+  background-color: var(--green-light);
+  border-color: var(--green-light);
+  color: #093515;
+}
+.btn-primary:hover {
+  background-color: #6AB84D;
+}
+.btn-outline-primary {
+  color: var(--green-light);
+  border-color: var(--green-light);
+}
+.btn-outline-primary:hover {
+  background-color: rgba(119,197,86,0.15);
+}
+
+.table {
+  color: var(--white);
+}
+.table thead th {
+  color: var(--green-light);
+}
+.table-hover tbody tr:hover {
+  background-color: rgba(119,197,86,0.08);
+}
+
+.kpi-card {
+  background-color: #0F1A13;
+  color: var(--white);
+}
+.kpi-card h6 {
+  color: var(--text-muted);
+}
+.kpi-card p {
+  color: var(--green-light);
+}
+
+.page-title {
+  color: var(--white);
+}
+
+/* Responsividade mantida */
+
+/* ===== Estrutura original adaptada ===== */
 /* ===== Estilos básicos ===== */
 /*
 body {
