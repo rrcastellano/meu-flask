@@ -98,34 +98,67 @@
     }
   });
 
-  // ============ Gráfico 2: Consumo por Mês (kWh) ============ //
-  new Chart(document.getElementById('chartConsumo'), {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
+
+// ============ Gráfico 2: Consumo por Mês (kWh) Consumo / 100Km ============ //
+new Chart(document.getElementById('chartConsumo'), {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [
+      {
         label: 'kWh no mês',
         data: apiData.consumo,
         backgroundColor: 'rgba(255,193,7,0.6)',
         borderColor: 'rgba(255,193,7,1)',
-        borderWidth: 1
-      }]
+        borderWidth: 1,
+        yAxisID: 'y'
+      },
+      {
+        type: 'line',
+        label: 'Consumo / 100Km',
+        data: apiData.consumo_por_100km,
+        borderColor: 'rgba(13,110,253,1)',
+        backgroundColor: 'rgba(13,110,253,0.2)',
+        tension: 0.25,
+        pointRadius: 3,
+        yAxisID: 'y2'
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    interaction: { mode: 'index', intersect: false },
+    scales: {
+      y: {
+        position: 'left',
+        title: { display: true, text: 'kWh' },
+        ticks: { callback: value => fmtNum(value) },
+        beginAtZero: true
+      },
+      y2: {
+        position: 'right',
+        title: { display: true, text: 'kWh / 100Km' },
+        ticks: { callback: value => fmtNum(value) },
+        beginAtZero: true,
+        grid: { drawOnChartArea: false }
+      }
     },
-    options: {
-      responsive: true,
-      scales: {
-        y: {
-          title: { display: true, text: 'kWh' },
-          ticks: { callback: value => fmtNum(value) },
-          beginAtZero: true
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: ctx => {
+            const dsLabel = ctx.dataset.label || '';
+            const v = ctx.raw;
+            const unidade = ctx.dataset.yAxisID === 'y' ? 'kWh' : 'kWh/100Km';
+            return `${dsLabel}: ${fmtNum(v)} ${unidade}`;
+          }
         }
       },
-      plugins: {
-        tooltip: { callbacks: { label: c => `${c.dataset.label}: ${fmtNum(c.raw)} kWh` } },
-        legend: { position: 'bottom' }
-      }
+      legend: { position: 'bottom' }
     }
-  });
+  }
+});
+
 
   // ============ Gráfico 3: Km Rodados por Mês ============ //
   new Chart(document.getElementById('chartKm'), {

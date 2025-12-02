@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  
   <title>Gestão de Recargas</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/lux/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -11,32 +13,45 @@
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
-      <a class="navbar-brand" href="{{ url_for('index') }}">Recargas</a>
+      {% if current_user.is_authenticated %}
+        <a class="navbar-brand" href="{{ url_for('dashboard') }}">Recargas</a>
+      {% else %}
+        <a class="navbar-brand" href="{{ url_for('index') }}">Recargas</a>
+      {% endif %}
+
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('recharge') }}">Nova Recarga</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('bulk_recharge') }}">Importar Recargas</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('account') }}">Conta</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Sair</a></li>
+          {% if current_user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('recharge') }}">Nova Recarga</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('bulk_recharge') }}">Importar Recargas</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_recharges') }}">Histórico</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('account') }}">Configurações</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Sair</a></li>
+          {% endif %}
         </ul>
       </div>
     </div>
   </nav>
 
-  <div class="container mt-3">
+  <!-- Mensagens flash -->
+  <div id="flash-container" class="container mt-3" aria-live="polite">
     {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-          </div>
-        {% endfor %}
-      {% endif %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show flash-msg"
+            role="alert"
+            data-category="{{ category }}"
+            data-timeout=""
+            style="transition: opacity .3s ease;">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
     {% endwith %}
   </div>
 
@@ -49,6 +64,78 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!--========================= Scripts Globais ===========================-->
+  <!---------------------------- Popovers Bootstrap ------------------------->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+      popoverTriggerList.forEach(function (popoverTriggerEl) {
+        new bootstrap.Popover(popoverTriggerEl);
+      });
+    });
+  </script>
+
+  <!---------------------- Fechamento automático de flashs ------------------->
+  <script>
+    // Mapa de tempo por categoria (em milissegundos)
+    const FLASH_TIMEOUTS = {
+      success: 2500,
+      info:    4000,
+      warning: 6000,
+      danger:  12000
+    };
+
+    // Permite sobrescrever via variável global caso você queira
+    const timeouts = window.FLASH_TIMEOUTS || FLASH_TIMEOUTS;
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const flashes = document.querySelectorAll('#flash-container .flash-msg');
+
+      flashes.forEach(el => {
+        const cat = (el.getAttribute('data-category') || '').trim().toLowerCase();
+        const duration = timeouts[cat] ?? 4000; // fallback 4s
+        el.setAttribute('data-timeout', String(duration));
+
+        const alert = new bootstrap.Alert(el);
+        let timerId = null;
+        let remaining = duration;
+        let lastStart = Date.now();
+
+        const startTimer = () => {
+          clearTimer();
+          lastStart = Date.now();
+          timerId = setTimeout(() => {
+            // Dismiss suave
+            try { alert.close(); } catch (e) {}
+          }, remaining);
+        };
+
+        const clearTimer = () => {
+          if (timerId) { clearTimeout(timerId); timerId = null; }
+        };
+
+        // Pausa quando o mouse entra; retoma quando sai
+        el.addEventListener('mouseenter', () => {
+          // calcula tempo restante
+          const elapsed = Date.now() - lastStart;
+          remaining = Math.max(0, remaining - elapsed);
+          clearTimer();
+        });
+        el.addEventListener('mouseleave', () => {
+          // retoma a contagem do restante
+          if (remaining > 0) startTimer();
+        });
+
+        // Se o usuário fechar manualmente, cancelar timer
+        el.addEventListener('closed.bs.alert', () => clearTimer());
+
+        // Inicia o timer
+        startTimer();
+      });
+    });
+  </script>
+
 
   <!-- Chart.js global -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>

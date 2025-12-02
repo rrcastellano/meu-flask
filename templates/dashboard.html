@@ -5,31 +5,7 @@
 <div class="container my-4">
   <h4>Dashboard</h4>
 
-  {# ===== Macro para renderizar indicador de tendência com tooltip ===== #}
-  {% macro trend_block(key) %}
-    {% set t = trends[key] %}
-    <div class="kpi-trend {{ t.direction }}" title="Variação vs mês anterior. ↑ aumento, ↓ redução, — estável.">
-      {% if t.direction == 'up' %}
-        <i class="bi bi-arrow-up-right"></i>
-      {% elif t.direction == 'down' %}
-        <i class="bi bi-arrow-down-right"></i>
-      {% else %}
-        <i class="bi bi-dash-lg"></i>
-      {% endif %}
-      <span class="value">
-        {% if t.percent is not none %}
-          {{ t.percent }}%
-        {% else %}
-          —
-        {% endif %}
-      </span>
-      <span class="label">
-        vs mês anterior {% if not t.has_prev %}(sem base){% endif %}
-      </span>
-    </div>
-  {% endmacro %}
-
-  <!-- ===================== KPIs ===================== -->
+<!-- ===================== KPIs ===================== -->
 <div class="kpi-grid">
   <!-- Linha 1 -->
   <div class="kpi-card kpi-quantidade">
@@ -215,9 +191,10 @@
   <!-- ===================== GRÁFICOS ===================== -->
   <div class="dashboard-charts">
     <div class="chart-card"><h6>Custos por Mês</h6><div class="chart-container"><canvas id="chartCustos"></canvas></div></div>
+    <div class="chart-card"><h6>Valores Economizados por Mês</h6><div class="chart-container"><canvas id="chartEconomia"></canvas></div></div>
     <div class="chart-card"><h6>Consumo por Mês (kWh)</h6><div class="chart-container"><canvas id="chartConsumo"></canvas></div></div>
     <div class="chart-card"><h6>Km Rodados por Mês</h6><div class="chart-container"><canvas id="chartKm"></canvas></div></div>
-    <div class="chart-card"><h6>Valores Economizados por Mês</h6><div class="chart-container"><canvas id="chartEconomia"></canvas></div></div>
+
   </div>
 </div>
 {% endblock %}

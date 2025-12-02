@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, Response
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
@@ -281,6 +281,7 @@ def recharge():
             odometro = form.odometro.data
             local = form.local.data
             observacoes = form.observacoes.data
+            isento = 1 if form.isento.data else 0
             conn = sqlite3.connect("dados.db")
             cursor = conn.cursor()
             cursor.execute("""
@@ -384,6 +385,7 @@ def account():
         form.consumo_km_l.data = float(config[1])
     return render_template("account.html", form=form)
 
+
 # ----------------- NOVA ROTA API PARA CHART.JS -----------------
 @app.route("/api/recharges")
 @login_required
@@ -398,6 +400,7 @@ def api_recharges():
     kwh = [float(r[1]) for r in rows]
     custo = [float(r[2]) for r in rows]
     return jsonify({"labels": labels, "kwh": kwh, "custo": custo})
+
 
 
 @app.route("/api/recharges/monthly")
@@ -438,7 +441,6 @@ def api_recharges_monthly():
         try:
             mes = datetime.fromisoformat(data).strftime("%Y-%m")  # 'YYYY-MM'
         except Exception:
-            # fallback simples: pegar 'YYYY-MM' do início da string
             mes = str(data)[:7]
 
         monthly[mes]["custo_total"] += float(custo or 0)
@@ -460,8 +462,9 @@ def api_recharges_monthly():
     kms = []
     economias_total = []
     economias_pagamento = []
+    consumo_por_100km_list = []
 
-    # Calcular economia e km por mês
+    # Calcular economia, km e consumo/100km por mês
     for idx, mes in enumerate(meses_ord):
         data_mes = monthly[mes]
         labels.append(mes)
@@ -474,15 +477,14 @@ def api_recharges_monthly():
         custos_percentual.append(round((cp / ct * 100) if ct > 0 else 0.0, 2))
 
         # Consumo
-        consumos.append(round(float(data_mes["kwh"]), 2))
+        consumo_mes = round(float(data_mes["kwh"]), 2)
+        consumos.append(consumo_mes)
 
         # Km rodados
         odos = data_mes["odometros"]
         if len(odos) >= 2:
-            # Dentro do mês: diferença entre maior e menor
             km_mes = max(odos) - min(odos)
         elif len(odos) == 1:
-            # Apenas um registro no mês: usa diferença vs último odômetro do mês anterior
             if idx > 0:
                 prev_odos = monthly[meses_ord[idx - 1]]["odometros"]
                 prev_last = max(prev_odos) if prev_odos else 0.0
@@ -493,6 +495,12 @@ def api_recharges_monthly():
             km_mes = 0.0
 
         kms.append(round(km_mes, 2))
+
+        # Consumo / 100Km
+        if km_mes > 0:
+            consumo_por_100km_list.append(round((consumo_mes / km_mes) * 100, 2))
+        else:
+            consumo_por_100km_list.append(0)
 
         # Economia (dependente de config)
         if tem_config:
@@ -519,7 +527,8 @@ def api_recharges_monthly():
         "economia": {
             "total": economias_total,
             "pagas": economias_pagamento
-        }
+        },
+        "consumo_por_100km": consumo_por_100km_list
     })
 
 
@@ -713,6 +722,243 @@ def dashboard():
     return render_template("dashboard.html", recargas=recargas, kpis=kpis, trends=trends)
 
 
+# ----------------- ROTA MANAGE RECHARGES -----------------
+@app.route("/manage_recharges")
+@login_required
+def manage_recharges():
+    return render_template("manage_recharges.html")
+
+
+# ========== ENDPOINT 1: GET /api/manage_recharges ==========
+@app.route('/api/manage_recharges')
+@login_required
+def api_manage_recharges():
+    page = int(request.args.get('page', 1))
+    page_size = int(request.args.get('page_size', 20))
+    sort_by = request.args.get('sort_by', 'data')
+    sort_dir = request.args.get('sort_dir', 'asc')
+
+    # Filtros
+    local = request.args.get('local', '').strip()
+    observacoes = request.args.get('observacoes', '').strip()
+    isento = request.args.get('isento', 'all')
+    date_from = request.args.get('date_from')
+    date_to = request.args.get('date_to')
+
+    # Validação sort_by
+    valid_sort = ['data', 'kwh', 'custo', 'isento', 'odometro', 'local', 'observacoes']
+    if sort_by not in valid_sort:
+        sort_by = 'data'
+    sort_dir = 'desc' if sort_dir == 'desc' else 'asc'
+
+    user_id = int(current_user.id)
+    conn = sqlite3.connect('dados.db')
+    cursor = conn.cursor()
+
+    # Monta cláusula WHERE
+    where_clauses = ['user_id=?']
+    params = [user_id]
+    if local:
+        where_clauses.append('LOWER(local) LIKE ?')
+        params.append(f'%{local.lower()}%')
+    if observacoes:
+        where_clauses.append('LOWER(observacoes) LIKE ?')
+        params.append(f'%{observacoes.lower()}%')
+    if isento in ['true', 'false']:
+        where_clauses.append('isento=?')
+        params.append(1 if isento == 'true' else 0)
+    if date_from:
+        where_clauses.append('date(data) >= date(?)')
+        params.append(date_from)
+    if date_to:
+        where_clauses.append('date(data) <= date(?)')
+        params.append(date_to)
+
+    where_sql = ' AND '.join(where_clauses)
+
+    # Conta total
+    cursor.execute(f'SELECT COUNT(*) FROM recharges WHERE {where_sql}', params)
+    total = cursor.fetchone()[0]
+
+    # Busca paginada
+    offset = (page - 1) * page_size
+    cursor.execute(f'''
+        SELECT id, data, kwh, custo, isento, odometro, local, observacoes
+        FROM recharges WHERE {where_sql}
+        ORDER BY {sort_by} {sort_dir}
+        LIMIT ? OFFSET ?
+    ''', params + [page_size, offset])
+    rows = cursor.fetchall()
+    conn.close()
+
+    items = []
+    for r in rows:
+        items.append({
+            'id': r[0], 'data': r[1], 'kwh': r[2], 'custo': r[3],
+            'isento': bool(r[4]), 'odometro': r[5], 'local': r[6], 'observacoes': r[7]
+        })
+
+    return jsonify({
+        'items': items,
+        'page': page,
+        'page_size': page_size,
+        'total': total,
+        'has_prev': page > 1,
+        'has_next': page * page_size < total
+    })
+
+# ========== ENDPOINT 2: PATCH /api/manage_recharges/<id> ==========
+@app.route('/api/manage_recharges/<int:recarga_id>', methods=['PATCH'])
+@login_required
+@csrf.exempt
+def api_update_recharge(recarga_id):
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'invalid_payload'}), 400
+
+    # Validação básica
+    required_fields = ['data', 'kwh', 'custo', 'odometro']
+    errors = {}
+    for f in required_fields:
+        if f not in data or str(data[f]).strip() == '':
+            errors[f] = 'Campo obrigatório'
+    if errors:
+        return jsonify({'error': 'validation_failed', 'fields': errors}), 400
+
+    try:
+        kwh = float(data['kwh'])
+        custo = float(data['custo'])
+        odometro = float(data['odometro'])
+        if kwh <= 0: errors['kwh'] = 'Deve ser > 0'
+        if custo < 0: errors['custo'] = 'Não pode ser negativo'
+        if odometro <= 0: errors['odometro'] = 'Deve ser > 0'
+    except ValueError:
+        return jsonify({'error': 'invalid_number_format'}), 400
+
+    if errors:
+        return jsonify({'error': 'validation_failed', 'fields': errors}), 400
+
+    # Atualiza no banco
+    conn = sqlite3.connect('dados.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT user_id FROM recharges WHERE id=?', (recarga_id,))
+    row = cursor.fetchone()
+    if not row:
+        conn.close()
+        return jsonify({'error': 'not_found'}), 404
+    if row[0] != int(current_user.id):
+        conn.close()
+        return jsonify({'error': 'forbidden'}), 403
+
+    cursor.execute('''
+        UPDATE recharges SET data=?, kwh=?, custo=?, isento=?, odometro=?, local=?, observacoes=? WHERE id=?
+    ''', (
+        data['data'], kwh, custo, 1 if data.get('isento') else 0,
+        odometro, data.get('local', ''), data.get('observacoes', ''), recarga_id
+    ))
+    conn.commit()
+
+    cursor.execute('SELECT id, data, kwh, custo, isento, odometro, local, observacoes FROM recharges WHERE id=?', (recarga_id,))
+    r = cursor.fetchone()
+    conn.close()
+
+    return jsonify({'updated': True, 'item': {
+        'id': r[0], 'data': r[1], 'kwh': r[2], 'custo': r[3],
+        'isento': bool(r[4]), 'odometro': r[5], 'local': r[6], 'observacoes': r[7]
+    }})
+
+# ========== ENDPOINT 3: DELETE /api/manage_recharges/<id> ==========
+@app.route('/api/manage_recharges/<int:recarga_id>', methods=['DELETE'])
+@login_required
+@csrf.exempt
+def api_delete_recharge(recarga_id):
+    conn = sqlite3.connect('dados.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT user_id FROM recharges WHERE id=?', (recarga_id,))
+    row = cursor.fetchone()
+    if not row:
+        conn.close()
+        return jsonify({'error': 'not_found'}), 404
+    if row[0] != int(current_user.id):
+        conn.close()
+        return jsonify({'error': 'forbidden'}), 403
+
+    cursor.execute('DELETE FROM recharges WHERE id=?', (recarga_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'deleted': True})
+
+
+
+# ----------------- ROTA EXPORTAR RECHARGES CSV -----------------
+@app.route('/export_recharges')
+@login_required
+def export_recharges():
+    # Captura filtros
+    local = request.args.get('local', '').strip()
+    observacoes = request.args.get('observacoes', '').strip()
+    isento = request.args.get('isento', 'all')
+    date_from = request.args.get('date_from')
+    date_to = request.args.get('date_to')
+
+    user_id = int(current_user.id)
+    conn = sqlite3.connect('dados.db')
+    cursor = conn.cursor()
+
+    # WHERE
+    where_clauses = ['user_id=?']
+    params = [user_id]
+    if local:
+        where_clauses.append('LOWER(local) LIKE ?')
+        params.append(f'%{local.lower()}%')
+    if observacoes:
+        where_clauses.append('LOWER(observacoes) LIKE ?')
+        params.append(f'%{observacoes.lower()}%')
+    if isento in ['true', 'false']:
+        where_clauses.append('isento=?')
+        params.append(1 if isento == 'true' else 0)
+    if date_from:
+        where_clauses.append('date(data) >= date(?)')  # ✅ sem entidades HTML
+        params.append(date_from)
+    if date_to:
+        where_clauses.append('date(data) <= date(?)')  # ✅ sem entidades HTML
+        params.append(date_to)
+
+    where_sql = ' AND '.join(where_clauses)
+
+    cursor.execute(f'''
+        SELECT data, kwh, custo, isento, odometro, local, observacoes
+        FROM recharges
+        WHERE {where_sql}
+        ORDER BY date(data), id
+    ''', params)
+    rows = cursor.fetchall()
+    conn.close()
+
+    # CSV em memória (newline='' evita linhas em branco em alguns ambientes)
+    output = io.StringIO(newline='')
+    writer = csv.writer(output)
+    writer.writerow(['Data', 'kWh', 'Custo', 'Isento', 'Odômetro', 'Local', 'Observações'])
+    for data, kwh, custo, isento, odometro, local_val, obs in rows:
+        writer.writerow([
+            data,
+            kwh,
+            custo,
+            True if isento else False,
+            odometro,
+            local_val or '',
+            obs or ''
+        ])
+
+    # Retorna como arquivo para download
+    return Response(
+        output.getvalue(),
+        mimetype='text/csv; charset=utf-8',
+        headers={'Content-Disposition': 'attachment; filename=recharges_export.csv'}
+    )
+
+
+# ----------------- RODA APLICACAO -----------------
 if __name__ == "__main__":
-    #app.run(debug=True)
-    app.run(host="0.0.0.0", port=5000)
+    app.run(debug=True)
+    #app.run(host="0.0.0.0", port=5000)

@@ -1,0 +1,154 @@
+
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Gerenciar Recargas</h2>
+
+    <!-- Barra de filtros -->
+    <div class="filters-bar mb-4">
+        <form id="filters-form" class="row g-3">
+            <div class="col-md-3">
+                <label for="filter-local" class="form-label">Local</label>
+                <input type="text" id="filter-local" name="local" class="form-control" placeholder="Ex.: Shopping">
+            </div>
+            <div class="col-md-3">
+                <label for="filter-observacoes" class="form-label">Observações</label>
+                <input type="text" id="filter-observacoes" name="observacoes" class="form-control" placeholder="Ex.: garagem">
+            </div>
+            <div class="col-md-2">
+                <label for="filter-isento" class="form-label">Isento</label>
+                <select id="filter-isento" name="isento" class="form-select">
+                    <option value="all">Todos</option>
+                    <option value="true">Sim</option>
+                    <option value="false">Não</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="filter-date-from" class="form-label">Data início</label>
+                <input type="date" id="filter-date-from" name="date_from" class="form-control">
+            </div>
+            <div class="col-md-2">
+                <label for="filter-date-to" class="form-label">Data fim</label>
+                <input type="date" id="filter-date-to" name="date_to" class="form-control">
+            </div>
+            <div class="col-12 d-flex gap-2 mt-2">
+                <button type="button" id="btn-apply-filters" class="btn btn-primary">Aplicar filtros</button>
+                <button type="button" id="btn-clear-filters" class="btn btn-secondary">Limpar</button>
+                <button type="button" id="btn-last-30-days" class="btn btn-outline-info">Últimos 30 dias</button>                
+                <button class="btn btn-success" id="btn-export"><i class="fa fa-file-csv"></i> Exportar CSV</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabela de recargas -->
+    <div class="table-responsive">
+        <table class="table table-striped table-hover" id="recharges-table">
+            <thead>
+                <tr>
+                    <th data-sort="data">Data <span class="sort-icon"></span></th>
+                    <th data-sort="kwh">kWh <span class="sort-icon"></span></th>
+                    <th data-sort="custo">Custo <span class="sort-icon"></span></th>
+                    <th data-sort="isento">Isento <span class="sort-icon"></span></th>
+                    <th data-sort="odometro">Odômetro <span class="sort-icon"></span></th>
+                    <th data-sort="local">Local <span class="sort-icon"></span></th>
+                    <th data-sort="observacoes">Observações <span class="sort-icon"></span></th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="recharges-body"></tbody>
+        </table>
+    </div>
+
+    <!-- Paginação -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div id="pagination-info">Exibindo 1–20 de 0</div>
+        <div class="btn-group">
+            <button id="btn-prev-page" class="btn btn-outline-secondary" disabled>Anterior</button>
+            <button id="btn-next-page" class="btn btn-outline-secondary">Próximo</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de edição -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Editar Recarga</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-form">
+                    <input type="hidden" id="edit-id">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="edit-data" class="form-label">Data *</label>
+                            <input type="date" id="edit-data" name="data" class="form-control" required>
+                            <div class="invalid-feedback">Informe uma data válida.</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="edit-kwh" class="form-label">kWh *</label>
+                            <input type="number" step="0.01" id="edit-kwh" name="kwh" class="form-control" required>
+                            <div class="invalid-feedback">Informe um valor válido.</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="edit-custo" class="form-label">Custo *</label>
+                            <input type="number" step="0.01" id="edit-custo" name="custo" class="form-control" required>
+                            <div class="invalid-feedback">Informe um valor válido.</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="edit-odometro" class="form-label">Odômetro *</label>
+                            <input type="number" step="0.1" id="edit-odometro" name="odometro" class="form-control" required>
+                            <div class="invalid-feedback">Informe um valor válido.</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="edit-isento" class="form-label">Isento</label>
+                            <input type="checkbox" id="edit-isento" name="isento" class="form-check-input">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit-local" class="form-label">Local</label>
+                            <input type="text" id="edit-local" name="local" class="form-control" maxlength="200">
+                        </div>
+                        <div class="col-md-12">
+                            <label for="edit-observacoes" class="form-label">Observações</label>
+                            <textarea id="edit-observacoes" name="observacoes" class="form-control" rows="3" maxlength="2000"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="btn-save-edit" class="btn btn-primary">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de exclusão -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                Tem certeza que deseja excluir esta recarga? Essa ação não pode ser desfeita.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="btn-confirm-delete" class="btn btn-danger">Excluir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toasts -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1055">
+    <div id="toast-container"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='manage_recharges.js') }}"></script>
+{% endblock %}
