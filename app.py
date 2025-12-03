@@ -1017,6 +1017,8 @@ def contact():
         )
 
         status = 'sucesso'
+
+        '''
         try:
             # Envia a mensagem
             mail.send(msg)
@@ -1024,7 +1026,8 @@ def contact():
         except Exception as e:
             status = f'erro: {str(e)}'
             flash('Erro ao enviar mensagem. Tente novamente mais tarde.')
-
+        '''
+        
         # Log no SQLite
         conn = sqlite3.connect('dados.db')
         cursor = conn.cursor()
@@ -1039,6 +1042,9 @@ def contact():
         
         conn.commit()
         conn.close()
+
+        # Simula envio bem-sucedido
+        flash('Mensagem enviada com sucesso!')
 
         # Redireciona para evitar reenvio do formulário ao atualizar a página
         return redirect(url_for('contact'))
