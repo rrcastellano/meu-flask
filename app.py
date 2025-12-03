@@ -1,9 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, Response
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 from flask_wtf import CSRFProtect, FlaskForm
-from wtforms import StringField, PasswordField, FloatField, DateField, TextAreaField, FileField, BooleanField
+from wtforms import StringField, PasswordField, FloatField, DateField, TextAreaField, FileField, BooleanField, EmailField, SubmitField 
 from wtforms.validators import DataRequired, Email, Length, NumberRange
 from werkzeug.utils import secure_filename
 import csv
@@ -15,6 +16,18 @@ from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "default_key")
+
+
+# Configuração do Gmail SMTP
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')  # seu email
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')  # app password
+
+mail = Mail(app)
+
+
 csrf = CSRFProtect(app)
 
 login_manager = LoginManager(app)
@@ -63,6 +76,14 @@ class AccountForm(FlaskForm):
 
 class BulkRechargeForm(FlaskForm):
     file = FileField("Arquivo CSV", validators=[DataRequired()])
+
+
+class ContactForm(FlaskForm):
+    nome = StringField('Nome', validators=[DataRequired()])
+    email = StringField('E-mail', validators=[DataRequired(), Email()])
+    mensagem = TextAreaField('Mensagem', validators=[DataRequired()])
+    submit = SubmitField('Enviar')
+
 
 
 # ----------------- FUNÇÃO AUXILIAR FORMATAR NÚMEROS -----------------
@@ -970,6 +991,63 @@ def export_recharges():
         mimetype='text/csv; charset=utf-8',
         headers={'Content-Disposition': f'attachment; filename={filename}'}
     )
+
+
+
+# ----------------- ENVIAR MENSAGEM AO CRIADOR -----------------
+@app.route('/contact', methods=['GET', 'POST'])
+@login_required
+def contact():
+    # Inicializa o formulário WTForms
+    form = ContactForm()
+    
+    # Valida o formulário quando enviado via POST
+    if form.validate_on_submit():
+        # Captura os dados validados do formulário WTForms
+        nome = form.nome.data
+        email = form.email.data
+        mensagem = form.mensagem.data # <-- A variável 'mensagem' agora está definida aqui
+
+        # --- Atribuir a mensagem a uma variável 'msg' ---
+        msg = Message(
+            subject=f'EVChargeLog.com - {nome}',
+            sender=os.getenv('MAIL_USERNAME'),  # usa seu e-mail para evitar rejeição
+            recipients=[os.getenv('MAIL_USERNAME')],
+            body=f'Nome: {nome}\nEmail: {email}\n\nMensagem:\n{mensagem}'
+        )
+
+        status = 'sucesso'
+        try:
+            # Envia a mensagem
+            mail.send(msg)
+            flash('Mensagem enviada com sucesso!')
+        except Exception as e:
+            status = f'erro: {str(e)}'
+            flash('Erro ao enviar mensagem. Tente novamente mais tarde.')
+
+        # Log no SQLite
+        conn = sqlite3.connect('dados.db')
+        cursor = conn.cursor()
+        
+        # --- Usar isoformat() para o tipo TIMESTAMP no SQLITE ---
+        data_envio = datetime.now().isoformat() 
+
+        cursor.execute('''
+            INSERT INTO contact_logs (nome, email, mensagem, data_envio, status)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (nome, email, mensagem, data_envio, status))
+        
+        conn.commit()
+        conn.close()
+
+        # Redireciona para evitar reenvio do formulário ao atualizar a página
+        return redirect(url_for('contact'))
+
+    # Se o método for GET ou a validação falhar, renderiza o template com o formulário
+    return render_template('contact.html', form=form)
+
+
+
 
 
 # ----------------- RODA APLICACAO -----------------

@@ -1,3 +1,4 @@
+-- Arquivo: schema.sql
 
 -- Criar tabela de usuários
 CREATE TABLE IF NOT EXISTS users (
@@ -35,3 +36,18 @@ CREATE TABLE IF NOT EXISTS settings (
 
 -- Criar índice para configurações por usuário
 CREATE UNIQUE INDEX IF NOT EXISTS idx_settings_user ON settings(user_id);
+
+-- ----------------- NOVA TABELA ADICIONADA E ATUALIZADA -----------------
+
+-- Criar tabela para logs de contato (formulário "Fale Conosco")
+CREATE TABLE IF NOT EXISTS contact_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT NOT NULL,
+    email TEXT NOT NULL,
+    mensagem TEXT NOT NULL,
+    data_envio TIMESTAMP NOT NULL,  -- ALTERADO PARA TIMESTAMP
+    status TEXT NOT NULL
+);
+
+-- Criar índice para otimizar consultas por data de envio
+CREATE INDEX IF NOT EXISTS idx_contact_logs_date ON contact_logs(data_envio);

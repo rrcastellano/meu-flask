@@ -30,6 +30,7 @@ EVChargeLog.com/
     │
     ├── account.html                # Configurações da conta
     ├── bulk_recharge.html          # Importação Recargas formato CSV
+    ├── contact.html                # Página para entrar em Contato    
     ├── dashboard.html              # Página Principal com Visualização dos Dados
     ├── index.html                  # Página de Login
     ├── layout.html                 # Estrutura Padrão de todas as Páginas

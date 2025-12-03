@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Removido o container mt-4 do arquivo anterior para combinar com o layout da página de recarga -->
+
+<h2 class="page-title mb-4"><i class="fa fa-envelope me-2"></i> Entre em Contato</h2>
+
+    <!-- Mensagens flash (globais, como sucesso ou erro de envio) -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <!-- Mantido o max-width aqui para as mensagens não ficarem muito longas -->
+            <div class="alert alert-info shadow-sm mb-3" style="max-width: 600px;">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Removido o Card e o limite de largura para combinar com o exemplo de recarga -->
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <!-- CAMPO NOME -->
+        <!-- O layout de recarga usa 'mb-3' e 'form-control' padrão -->
+        <div class="mb-3" style="max-width: 600px;">
+            {{ form.nome.label(class_="form-label") }}
+            <!-- Adiciona a classe is-invalid se houver erros no campo -->
+            {{ form.nome(class_="form-control " + ("is-invalid" if form.nome.errors else ""), placeholder="Seu nome") }}
+            {% if form.nome.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.nome.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- CAMPO E-MAIL -->
+        <div class="mb-3" style="max-width: 600px;">
+            {{ form.email.label(class_="form-label") }}
+            {{ form.email(class_="form-control " + ("is-invalid" if form.email.errors else ""), placeholder="seuemail@exemplo.com") }}
+            {% if form.email.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.email.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- CAMPO MENSAGEM -->
+        <div class="mb-3" style="max-width: 600px;">
+            {{ form.mensagem.label(class_="form-label") }}
+            {{ form.mensagem(class_="form-control " + ("is-invalid" if form.mensagem.errors else ""), rows="5", placeholder="Escreva sua mensagem") }}
+            {% if form.mensagem.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.mensagem.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div> 
+            <!-- Botão sem d-grid ou btn-lg, como no exemplo de recarga -->
+            {{ form.submit(class_="btn btn-primary") }}
+        </div>
+    </form>
+
+{% endblock %}
