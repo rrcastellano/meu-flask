@@ -950,11 +950,25 @@ def export_recharges():
             obs or ''
         ])
 
+    # Decide o nome do arquivo conforme filtros
+    filtros_aplicados = any([
+        bool(local),
+        bool(observacoes),
+        isento in ['true', 'false'],
+        bool(date_from),
+        bool(date_to)
+    ])
+    filename = (
+        'recharge_export_filtered.csv'
+        if filtros_aplicados
+        else 'recharge_export_complete.csv'
+    )
+
     # Retorna como arquivo para download
     return Response(
         output.getvalue(),
         mimetype='text/csv; charset=utf-8',
-        headers={'Content-Disposition': 'attachment; filename=recharges_export.csv'}
+        headers={'Content-Disposition': f'attachment; filename={filename}'}
     )
 
 
@@ -962,3 +976,7 @@ def export_recharges():
 if __name__ == "__main__":
     #app.run(debug=True)
     app.run(host="0.0.0.0", port=5000)
+
+
+
+# source /Users/ronaldo.ribeirocastellano/Code/python_rc/bin/activate

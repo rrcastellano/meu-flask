@@ -1,16 +1,21 @@
-Final Project/
+EVChargeLog.com/
+│
 ├── app.py                          # Código base Flask com autenticação inicial
 ├── dados.db                        # Banco SQLite com tabelas users, recharges, settings
 ├── estrutura.txt                   # Esse arquivo, com informações da estrutura do site
 ├── Procfile                        # web: gunicorn app:app
-├── requirements.txt                # Dependências (Flask, Flask-Login, Werkzeug, Matplotlib)
+├── requirements.txt                # Dependências (Flask, Flask-Login, Werkzeug, WTForms, email-validator, gunicorn)
+├── schema.sql                      # Script SQL do banco de dados
 │
 ├── static/
+│   │
 │   ├── styles.css                  # Estilos básicos
 │   ├── styles-dark.css             # Novo estilo, vamos migrar para esse
 │   ├── manage_recharges.js         # Javascript para histórico das tabelas no manage_recharges.html
 │   ├── styles-dark.css             # Novo estilo, vamos migrar para esse
+│   │
 │   └── img/
+│       │
 │       ├── favicon-16x16.png       # Logo em 16x16
 │       ├── favicon-32x32.png       # Logo em 32x32
 │       ├── favicon-48x48.png       # Logo em 48x48
@@ -22,6 +27,7 @@ Final Project/
 │       └── favicon.ico             # Logo em ícone
 │
 └── templates/
+    │
     ├── account.html                # Configurações da conta
     ├── bulk_recharge.html          # Importação Recargas formato CSV
     ├── dashboard.html              # Página Principal com Visualização dos Dados
@@ -32,11 +38,5 @@ Final Project/
     ├── manage_recharges.html       # Editar todas as Recargas
     │
     └── partials/
+        │
         └── dashboard_charts.js     # Javascript para geração dos charts no dashboard.html
-        
-
-
-
-
-
-source /Users/ronaldo.ribeirocastellano/Code/python_rc/bin/activate
