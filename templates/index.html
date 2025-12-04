@@ -2,20 +2,20 @@
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-md-6">
-    <h2 class="text-center">Login</h2>
+    <h2 class="text-center">{{ _("Login") }}</h2>
     <form method="POST" action="/login">
       {{ form.hidden_tag() }}
       <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
+        <label for="email" class="form-label">{{ _("Email") }}</label>
         {{ form.email(class_='form-control', id='email') }}
       </div>
       <div class="mb-3">
-        <label for="senha" class="form-label">Senha</label>
+        <label for="senha" class="form-label">{{ _("Senha") }}</label>
         {{ form.senha(class_='form-control', id='senha') }}
       </div>
       <button type="submit" class="btn btn-primary w-100">Entrar</button>
     </form>
-    <p class="text-center mt-3">Não tem conta? <a href="/register">Cadastre-se</a></p>
+    <p class="text-center mt-3">{{ _("Não tem conta?") }} <a href="/register">{{ _("Cadastre-se") }}</a></p>
   </div>
 </div>
 {% endblock %}

@@ -1,14 +1,30 @@
-/* ===== Estilos básicos ===== */
-/*
-body {
-  font-family: Arial, sans-serif;
+/* ===== Variáveis da Paleta de Cores e Fonte ===== */
+:root {
+  --green-dark: #0F6634;
+  --green-light: #77C556;
+  --white: #FFFFFF;
+  --black: #000000; /* Nova variável para o preto */
+  /* Cores de status adaptadas para a paleta */
+  --blue-primary: #0d6efd; /* Usando blue como primary */
+  --darkgreen-primary: #0F6634; /* Usando green-dark como primary */
+  --green-primary: #198754; /* Usando green como primary */
+  --green-success: #77C556; /* Usando green-light como success */
+  --yellow-warning: #ffc107; /* Mantido amarelo padrão para warning */
+  --orange-accent: #fd7e14; /* Mantido laranja padrão */
+  --red-danger: #dc3545; /* Mantido vermelho padrão para danger */
+
+  --text-color-primary: var(--black); /* Cor principal do texto agora é preta */
+  --text-color-secondary: #555;
+  --background-card: var(--white);
+  --shadow-color: rgba(0, 0, 0, 0.1);
 }
-*/
 
 /* ======== Estilo geral ======== */
 body {
     /*background-color: #f8f9fa;*/
-    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background-color: #f4f4f4; /* Um cinza claro suave */
+    font-family: 'Nunito Sans Rounded', sans-serif;
+    color: var(--text-color-primary);
 }
 
 
@@ -16,11 +32,26 @@ body {
 .container h2, .container h4, .container h5 {
   margin-top: 0.5rem;
   margin-bottom: 1rem;
+  color: var(--black); /* Títulos em preto */
+}
+
+/* Reduz o padding vertical do navbar principal */
+.navbar {
+    padding-top: 0.5rem; /* Ajuste este valor conforme necessário, e.g., 0.3rem para menor */
+    padding-bottom: 0.5rem; /* Ajuste este valor conforme necessário */
+}
+
+/* Reduz o padding vertical dos links de navegação dentro do navbar */
+.nav-link {
+    padding-top: 0.4rem; /* Ajuste este valor conforme necessário */
+    padding-bottom: 0.4rem; /* Ajuste este valor conforme necessário */
 }
 
 .navbar-brand {
   font-weight: 600;
   letter-spacing: 0.2px;
+  color: var(--white) !important; /* Marca do navbar em branco */
+  text-transform: none; /* Adicione esta linha para evitar maiúsculas */
 }
 
 footer {
@@ -40,10 +71,10 @@ footer {
 
 .kpi-card {
   position: relative;
-  background: #fff;
+  background: var(--background-card);
   border-radius: 8px;
   padding: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px var(--shadow-color);
   text-align: center;
   transition: transform 0.2s ease;
 }
@@ -60,14 +91,14 @@ footer {
 
 .kpi-card h6 {
   font-size: 0.9rem;
-  color: #555;
+  color: var(--text-color-secondary);
   margin-bottom: 0.3rem;
 }
 
 .kpi-card p {
   font-size: 1.4rem;
   font-weight: bold;
-  color: #333;
+  color: var(--black); /* Valor do KPI em preto */
 }
 
 /* Ícone de informação (popover trigger) */
@@ -81,14 +112,14 @@ footer {
 }
 
 .kpi-info:hover {
-  color: #555;
+  color: var(--text-color-secondary);
 }
 
-/* Cores por categoria */
-.kpi-quantidade i { color: #0d6efd; } /* Azul */
-.kpi-custo i { color: #198754; }      /* Verde */
-.kpi-consumo i { color: #ffc107; }    /* Amarelo */
-.kpi-economia i { color: #fd7e14; }   /* Laranja */
+/* Cores por categoria (adaptado) */
+.kpi-quantidade i { color: var(--blue-primary); } /* Dark Green */
+.kpi-custo i { color: var(--green-primary); }      /* Green */
+.kpi-consumo i { color: var(--yellow-warning); }    /* Amarelo */
+.kpi-economia i { color: var(--orange-accent); }   /* Laranja */
 
 /* ===== Indicadores de tendência ===== */
 .kpi-trend {
@@ -99,8 +130,8 @@ footer {
   gap: 0.25rem;
 }
 
-.kpi-trend.up { color: #198754; }    /* verde */
-.kpi-trend.down { color: #dc3545; }  /* vermelho */
+.kpi-trend.up { color: var(--green-success); }    /* Light green */
+.kpi-trend.down { color: var(--red-danger); }  /* vermelho */
 .kpi-trend.flat { color: #6c757d; }  /* cinza */
 
 .kpi-trend .value {
@@ -116,10 +147,10 @@ footer {
 }
 
 .chart-card {
-  background: #fff;
+  background: var(--background-card);
   border-radius: 8px;
   padding: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px var(--shadow-color);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -129,7 +160,7 @@ footer {
   font-size: 1rem;
   font-weight: 600;
   margin-bottom: 0.8rem;
-  color: #333;
+  color: var(--black); /* Título do gráfico em preto */
 }
 
 .chart-container {
@@ -155,16 +186,17 @@ footer {
 }
 
 
-
-
 /* ======== Cards ======== */
 .card {
     border-radius: 8px;
     overflow: hidden;
+    background-color: var(--background-card);
 }
 .card-header {
     font-weight: 600;
     letter-spacing: 0.5px;
+    background-color: var(--white); /* Garante que o header use o background da paleta */
+    color: var(--black); /* Título do card header em preto */
 }
 .card.shadow-sm {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
@@ -176,6 +208,13 @@ footer {
     font-weight: 500;
     transition: all 0.2s ease-in-out;
 }
+
+/* Adaptação para botões primários do Bootstrap */
+.btn-primary {
+    background-color: var(--darkgreen-primary);
+    border-color: var(--darkgreen-primary;
+}
+
 .btn:hover {
     transform: scale(1.03);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
@@ -189,6 +228,7 @@ footer {
     text-transform: uppercase;
     font-size: 0.85rem;
     letter-spacing: 0.5px;
+    color: var(--white); /* Cabeçalho da tabela em branco */
 }
 .table-hover tbody tr:hover {
     background-color: #f1f3f5;
@@ -202,12 +242,19 @@ footer {
 }
 .btn-outline-primary {
     border-width: 2px;
+    color: var(--darkgreen-primary);
+    border-color: var(--darkgreen-primary);
+}
+.btn-outline-primary:hover {
+    background-color: var(--darkgreen-primary);
+    color: var(--white);
 }
 
 /* ======== Spinner ======== */
 #loading-spinner .spinner-border {
     width: 3rem;
     height: 3rem;
+    color: var(--green-dark);
 }
 
 /* ======== Modal ======== */
@@ -215,10 +262,10 @@ footer {
     font-weight: 600;
 }
 .modal-header.bg-warning {
-    background-color: #ffc107 !important;
+    background-color: var(--yellow-warning) !important;
 }
 .modal-header.bg-danger {
-    background-color: #dc3545 !important;
+    background-color: var(--red-danger) !important;
 }
 .modal-title i {
     margin-right: 8px;
@@ -238,11 +285,9 @@ footer {
     transition: transform 0.2s ease;
 }
 
-
-
 .page-title {
     font-size: 1.8rem;
     font-weight: 600;
     margin-bottom: 2.5rem; /* aumenta espaço abaixo do título */
-    color: #343a40;
+    color: var(--black); /* Título da página em preto */
 }

@@ -1,0 +1,610 @@
+# Portuguese (Brazil) translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-12-04 16:35-0300\n"
+"PO-Revision-Date: 2025-12-04 12:41-0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: pt_BR\n"
+"Language-Team: pt_BR <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: app.py:224
+msgid "Arquivo CSV sem cabeçalho."
+msgstr "Arquivo CSV sem cabeçalho."
+
+#: app.py:232
+msgid "Cabeçalhos inválidos."
+msgstr "Cabeçalhos inválidos."
+
+#: app.py:247
+msgid "Campo 'data' vazio."
+msgstr "Campo 'data' vazio."
+
+#: app.py:275
+msgid "Nenhuma linha válida foi encontrada no CSV."
+msgstr "Nenhuma linha válida foi encontrada no CSV."
+
+#: app.py:301
+msgid "Login realizado com sucesso!"
+msgstr "Login realizado com sucesso!"
+
+#: app.py:304
+msgid "Credenciais inválidas."
+msgstr "Credenciais inválidas."
+
+#: app.py:324
+msgid "Conta criada com sucesso! Faça login."
+msgstr "Conta criada com sucesso! Faça login."
+
+#: app.py:327
+msgid "Email já cadastrado."
+msgstr "Email já cadastrado."
+
+#: app.py:340
+msgid "Você saiu da conta."
+msgstr "Você saiu da conta."
+
+#: app.py:364
+msgid "Recarga registrada com sucesso!"
+msgstr "Recarga registrada com sucesso!"
+
+#: app.py:445
+msgid "Configurações atualizadas com sucesso!"
+msgstr "Configurações atualizadas com sucesso!"
+
+#: app.py:895
+msgid "Campo obrigatório"
+msgstr "Campo obrigatório"
+
+#: app.py:903 app.py:905
+msgid "Deve ser > 0"
+msgstr "Deve ser > 0"
+
+#: app.py:904
+msgid "Não pode ser negativo"
+msgstr "Não pode ser negativo"
+
+#: app.py:1097
+msgid "Mensagem enviada com sucesso!"
+msgstr "Mensagem enviada com sucesso!"
+
+#: templates/account.html:3
+msgid "Configurações da Conta"
+msgstr "Configurações da Conta"
+
+#: templates/account.html:7
+msgid "Preço da Gasolina (R$/litro)"
+msgstr "Preço da Gasolina (R$/litro)"
+
+#: templates/account.html:11
+msgid "Consumo Médio (km/l)"
+msgstr "Consumo Médio (km/l)"
+
+#: templates/account.html:14
+msgid "Salvar Configurações"
+msgstr "Salvar Configurações"
+
+#: templates/bulk_recharge.html:4
+msgid "Importar Recargas em Lote"
+msgstr "Importar Recargas em Lote"
+
+#: templates/bulk_recharge.html:8
+msgid "Arquivo CSV"
+msgstr "Arquivo CSV"
+
+#: templates/bulk_recharge.html:11
+msgid "O arquivo deve conter as colunas:"
+msgstr "O arquivo deve conter as colunas:"
+
+#: templates/bulk_recharge.html:15
+msgid "Importar"
+msgstr "Importar"
+
+#: templates/bulk_recharge.html:22
+msgid "Exemplo de CSV"
+msgstr "Exemplo de CSV"
+
+#: templates/bulk_recharge.html:23
+msgid ""
+"data,kwh,custo,isento,odometro,local,observacoes\n"
+"2025-11-01,0.0,0.00,TRUE,0,Bought,Starting point\n"
+"2025-11-02,20.5,15.00,TRUE,12000,Estação A,Recarga rápida\n"
+"2025-11-10,18.0,13.50,FALSE,12250,Estação B,Recarga normal\n"
+"2025-11-20,22.3,16.75,TRUE,12500,Estação C,Recarga completa\n"
+"2025-11-25,19.8,14.90,FALSE,12750,Estação D,Recarga parcial"
+msgstr ""
+"data,kwh,custo,isento,odometro,local,observacoes\n"
+"2025-11-01,0.0,0.00,TRUE,0,Comprado,Ponto Inicial\n"
+"2025-11-02,20.5,15.00,TRUE,12000,Estação A,Recarga rápida\n"
+"2025-11-10,18.0,13.50,FALSE,12250,Estação B,Recarga normal\n"
+"2025-11-20,22.3,16.75,TRUE,12500,Estação C,Recarga completa\n"
+"2025-11-25,19.8,14.90,FALSE,12750,Estação D,Recarga parcial"
+
+#: templates/contact.html:3
+msgid "Entre em Contato"
+msgstr "Entre em Contato"
+
+#: templates/contact.html:64
+msgid "Enviar"
+msgstr "Enviar"
+
+#: templates/dashboard.html:5 templates/layout.html:49
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#: templates/dashboard.html:11 templates/dashboard.html:16
+msgid "Recargas"
+msgstr "Recargas"
+
+#: templates/dashboard.html:12
+msgid "Quantidade de recargas registradas no período."
+msgstr "Quantidade de recargas registradas no período."
+
+#: templates/dashboard.html:22 templates/dashboard.html:27
+msgid "Recargas Isentas"
+msgstr "Recargas Isentas"
+
+#: templates/dashboard.html:23
+msgid "Recargas gratuitas."
+msgstr "Recargas gratuitas."
+
+#: templates/dashboard.html:33 templates/dashboard.html:38
+msgid "Recargas Pagas"
+msgstr "Recargas Pagas"
+
+#: templates/dashboard.html:34
+msgid "Recargas pagas."
+msgstr "Recargas pagas."
+
+#: templates/dashboard.html:44 templates/dashboard.html:49
+msgid "Km Rodados"
+msgstr "Km Rodados"
+
+#: templates/dashboard.html:45
+msgid "Diferença entre o último e o primeiro odômetro no período."
+msgstr "Diferença entre o último e o primeiro odômetro no período."
+
+#: templates/dashboard.html:56 templates/dashboard.html:61
+#: templates/dashboard.html:221
+msgid "Consumo / 100Km"
+msgstr "Consumo / 100Km"
+
+#: templates/dashboard.html:57
+msgid "Somatório de kWh ÷ Total de km × 100."
+msgstr "Somatório de kWh ÷ Total de km × 100."
+
+#: templates/dashboard.html:67 templates/dashboard.html:72
+msgid "Custo Médio / kWh"
+msgstr "Custo Médio / kWh"
+
+#: templates/dashboard.html:68
+msgid "Custo total ÷ kWh total."
+msgstr "Custo total ÷ kWh total."
+
+#: templates/dashboard.html:78 templates/dashboard.html:83
+msgid "Custo Médio / Km"
+msgstr "Custo Médio / Km"
+
+#: templates/dashboard.html:79
+msgid "Custo total ÷ km rodados."
+msgstr "Custo total ÷ km rodados."
+
+#: templates/dashboard.html:89 templates/dashboard.html:94
+msgid "Custo Gasolina / Km"
+msgstr "Custo Gasolina / Km"
+
+#: templates/dashboard.html:90
+msgid "Preço da gasolina ÷ consumo (km/l)."
+msgstr "Preço da gasolina ÷ consumo (km/l)."
+
+#: templates/dashboard.html:101 templates/dashboard.html:106
+msgid "Custo Total"
+msgstr "Custo Total"
+
+#: templates/dashboard.html:102
+msgid "Somatório dos custos (inclui isentas)."
+msgstr "Somatório dos custos (inclui isentas)."
+
+#: templates/dashboard.html:112 templates/dashboard.html:117
+msgid "Recargas Isentas (R$)"
+msgstr "Recargas Isentas (R$)"
+
+#: templates/dashboard.html:113 templates/dashboard.html:124
+msgid "Somatório do custo com isento."
+msgstr "Somatório do custo com isento."
+
+#: templates/dashboard.html:123 templates/dashboard.html:128
+#: templates/dashboard.html:218
+msgid "Recargas Pagas (R$)"
+msgstr "Recargas Pagas (R$)"
+
+#: templates/dashboard.html:134 templates/dashboard.html:139
+msgid "Consumo Total"
+msgstr "Consumo Total"
+
+#: templates/dashboard.html:135
+msgid "Somatório de kWh (isentas e pagas)."
+msgstr "Somatório de kWh (isentas e pagas)."
+
+#: templates/dashboard.html:146 templates/dashboard.html:151
+msgid "Economia (Custo)"
+msgstr "Economia (Custo)"
+
+#: templates/dashboard.html:147
+msgid "Custo simulado da gasolina − Custo total."
+msgstr "Custo simulado da gasolina − Custo total."
+
+#: templates/dashboard.html:157 templates/dashboard.html:162
+msgid "Economia (Custo) / Km"
+msgstr "Economia (Custo) / Km"
+
+#: templates/dashboard.html:158
+msgid "Economia total ÷ km rodados."
+msgstr "Economia total ÷ km rodados."
+
+#: templates/dashboard.html:168 templates/dashboard.html:173
+msgid "Economia (Pagas)"
+msgstr "Economia (Pagas)"
+
+#: templates/dashboard.html:169
+msgid "Custo simulado da gasolina − Custo das recargas pagas."
+msgstr "Custo simulado da gasolina − Custo das recargas pagas."
+
+#: templates/dashboard.html:179 templates/dashboard.html:184
+msgid "Economia (Pagas) / Km"
+msgstr "Economia (Pagas) / Km"
+
+#: templates/dashboard.html:180
+msgid "Economia (pagas) ÷ km rodados."
+msgstr "Economia (pagas) ÷ km rodados."
+
+#: templates/dashboard.html:191
+msgid "Custos por Mês"
+msgstr "Custos por Mês"
+
+#: templates/dashboard.html:192
+msgid "Valores Economizados por Mês"
+msgstr "Valores Economizados por Mês"
+
+#: templates/dashboard.html:193
+msgid "Consumo por Mês (kWh)"
+msgstr "Consumo por Mês (kWh)"
+
+#: templates/dashboard.html:194
+msgid "Km Rodados por Mês"
+msgstr "Km Rodados por Mês"
+
+#: templates/dashboard.html:208
+msgid "Falha ao carregar dados mensais:"
+msgstr "Falha ao carregar dados mensais:"
+
+#: templates/dashboard.html:209
+msgid "Não foi possível carregar os dados."
+msgstr "Não foi possível carregar os dados."
+
+#: templates/dashboard.html:210
+msgid "Sem dados para exibir."
+msgstr "Sem dados para exibir."
+
+#: templates/dashboard.html:213
+msgid "R$"
+msgstr "R$"
+
+#: templates/dashboard.html:214
+msgid "pt-BR"
+msgstr "pt-BR"
+
+#: templates/dashboard.html:217
+msgid "Custo Total (R$)"
+msgstr "Custo Total (R$)"
+
+#: templates/dashboard.html:219
+msgid "% Pagas sobre Total"
+msgstr "% Pagas sobre Total"
+
+#: templates/dashboard.html:220
+msgid "kWh no mês"
+msgstr "kWh no mês"
+
+#: templates/dashboard.html:222 templates/manage_recharges.html:70
+#: templates/manage_recharges.html:117
+msgid "kWh"
+msgstr "kWh"
+
+#: templates/dashboard.html:223
+msgid "kWh / 100Km"
+msgstr "kWh / 100Km"
+
+#: templates/dashboard.html:224
+msgid "Km no mês"
+msgstr "Km no mês"
+
+#: templates/dashboard.html:225
+msgid "Km"
+msgstr "Km"
+
+#: templates/dashboard.html:226
+msgid "Economia Total (R$)"
+msgstr "Economia Total (R$)"
+
+#: templates/dashboard.html:227
+msgid "Economia (Pagas) (R$)"
+msgstr "Economia (Pagas) (R$)"
+
+#: templates/index.html:5
+msgid "Login"
+msgstr "Login"
+
+#: templates/index.html:9 templates/register.html:14
+msgid "Email"
+msgstr "Email"
+
+#: templates/index.html:13 templates/register.html:18
+msgid "Senha"
+msgstr "Senha"
+
+#: templates/index.html:18
+msgid "Não tem conta?"
+msgstr "Não tem conta?"
+
+#: templates/index.html:18
+msgid "Cadastre-se"
+msgstr "Cadastre-se"
+
+#: templates/layout.html:50
+msgid "Nova Recarga"
+msgstr "Nova Recarga"
+
+#: templates/layout.html:51
+msgid "Importar Recargas"
+msgstr "Importar Recargas"
+
+#: templates/layout.html:52
+msgid "Histórico"
+msgstr "Histórico"
+
+#: templates/layout.html:53
+msgid "Configurações"
+msgstr "Configurações"
+
+#: templates/layout.html:54
+msgid "Contato"
+msgstr "Contato"
+
+#: templates/layout.html:55
+msgid "Sair"
+msgstr "Sair"
+
+#: templates/layout.html:85
+msgid "2025 Gestão de Recargas"
+msgstr "2025 Gestão de Recargas"
+
+#: templates/manage_recharges.html:5
+msgid "Gerenciar Recargas"
+msgstr "Gerenciar Recargas"
+
+#: templates/manage_recharges.html:9
+msgid "Filtros"
+msgstr "Filtros"
+
+#: templates/manage_recharges.html:18 templates/manage_recharges.html:75
+#: templates/manage_recharges.html:140 templates/recharge.html:27
+msgid "Observações"
+msgstr "Observações"
+
+#: templates/manage_recharges.html:22 templates/manage_recharges.html:72
+#: templates/manage_recharges.html:132
+msgid "Isento"
+msgstr "Isento"
+
+#: templates/manage_recharges.html:24 templates/manage_recharges.html:185
+msgid "Todos"
+msgstr "Todos"
+
+#: templates/manage_recharges.html:25 templates/manage_recharges.html:183
+msgid "Sim"
+msgstr "Sim"
+
+#: templates/manage_recharges.html:26 templates/manage_recharges.html:184
+msgid "Não"
+msgstr "Não"
+
+#: templates/manage_recharges.html:30
+msgid "Data início"
+msgstr "Data início"
+
+#: templates/manage_recharges.html:34
+msgid "Data fim"
+msgstr "Data fim"
+
+#: templates/manage_recharges.html:39
+msgid "Aplicar filtros"
+msgstr "Aplicar filtros"
+
+#: templates/manage_recharges.html:42
+msgid "Limpar"
+msgstr "Limpar"
+
+#: templates/manage_recharges.html:45
+msgid "Últimos 30 dias"
+msgstr "Últimos 30 dias"
+
+#: templates/manage_recharges.html:48
+msgid "Exportar CSV"
+msgstr "Exportar CSV"
+
+#: templates/manage_recharges.html:63
+msgid "Histórico de Recargas"
+msgstr "Histórico de Recargas"
+
+#: templates/manage_recharges.html:69 templates/recharge.html:7
+msgid "Data"
+msgstr "Data"
+
+#: templates/manage_recharges.html:71 templates/manage_recharges.html:122
+msgid "Custo"
+msgstr "Custo"
+
+#: templates/manage_recharges.html:73 templates/manage_recharges.html:127
+msgid "Odômetro"
+msgstr "Odômetro"
+
+#: templates/manage_recharges.html:74 templates/manage_recharges.html:136
+#: templates/recharge.html:23
+msgid "Local"
+msgstr "Local"
+
+#: templates/manage_recharges.html:76
+msgid "Ações"
+msgstr "Ações"
+
+#: templates/manage_recharges.html:86 templates/manage_recharges.html:198
+msgid "Exibindo"
+msgstr "Exibindo"
+
+#: templates/manage_recharges.html:89
+msgid "Anterior"
+msgstr "Anterior"
+
+#: templates/manage_recharges.html:92
+msgid "Próximo"
+msgstr "Próximo"
+
+#: templates/manage_recharges.html:104
+msgid "Editar Recarga"
+msgstr "Editar Recarga"
+
+#: templates/manage_recharges.html:114
+msgid "Informe uma data válida."
+msgstr "Informe uma data válida."
+
+#: templates/manage_recharges.html:119 templates/manage_recharges.html:124
+#: templates/manage_recharges.html:129
+msgid "Informe um valor válido."
+msgstr "Informe um valor válido."
+
+#: templates/manage_recharges.html:147 templates/manage_recharges.html:166
+msgid "Cancelar"
+msgstr "Cancelar"
+
+#: templates/manage_recharges.html:148 templates/recharge.html:30
+msgid "Salvar"
+msgstr "Salvar"
+
+#: templates/manage_recharges.html:159
+msgid "Confirmar Exclusão"
+msgstr "Confirmar Exclusão"
+
+#: templates/manage_recharges.html:163
+msgid ""
+"Tem certeza que deseja excluir esta recarga? Essa ação não pode ser "
+"desfeita."
+msgstr ""
+"Tem certeza que deseja excluir esta recarga? Essa ação não pode ser "
+"desfeita."
+
+#: templates/manage_recharges.html:167 templates/manage_recharges.html:197
+msgid "Excluir"
+msgstr "Excluir"
+
+#: templates/manage_recharges.html:188
+msgid "Erro ao carregar recargas."
+msgstr "Erro ao carregar recargas."
+
+#: templates/manage_recharges.html:189
+msgid "Nenhuma recarga encontrada."
+msgstr "Nenhuma recarga encontrada."
+
+#: templates/manage_recharges.html:190
+msgid "Erro ao salvar edição."
+msgstr "Erro ao salvar edição."
+
+#: templates/manage_recharges.html:191
+msgid "Recarga atualizada com sucesso!"
+msgstr "Recarga atualizada com sucesso!"
+
+#: templates/manage_recharges.html:192
+msgid "Erro ao excluir recarga."
+msgstr "Erro ao excluir recarga."
+
+#: templates/manage_recharges.html:193
+msgid "Recarga excluída com sucesso!"
+msgstr "Recarga excluída com sucesso!"
+
+#: templates/manage_recharges.html:196
+msgid "Editar"
+msgstr "Editar"
+
+#: templates/manage_recharges.html:199
+msgid "de"
+msgstr "de"
+
+#: templates/recharge.html:3
+msgid "Registrar Recargas"
+msgstr "Registrar Recargas"
+
+#: templates/recharge.html:11
+msgid "kWh Carregados"
+msgstr "kWh Carregados"
+
+#: templates/recharge.html:15
+msgid "Custo (R$)"
+msgstr "Custo (R$)"
+
+#: templates/recharge.html:19
+msgid "Odômetro (km)"
+msgstr "Odômetro (km)"
+
+#: templates/register.html:6 templates/register.html:21
+msgid "Registrar"
+msgstr "Registrar"
+
+#: templates/register.html:10
+msgid "Nome"
+msgstr "Nome"
+
+#: templates/register.html:23
+msgid "Já tem conta?"
+msgstr "Já tem conta?"
+
+#: templates/register.html:23
+msgid "Faça login"
+msgstr "Faça login"
+
+#: templates/contact.html:25
+msgid "Seu nome"
+msgstr "Seu nome"
+
+#: templates/contact.html:38
+msgid "seuemail@exemplo.com"
+msgstr "seuemail@exemplo.com"
+
+#: templates/contact.html:51
+msgid "Escreva sua mensagem"
+msgstr "Escreva sua mensagem"
+
+#: templates/manage_recharges.html:15
+msgid "Ex.: Shopping"
+msgstr "Ex.: Shopping"
+
+#: templates/manage_recharges.html:19
+msgid "Ex.: garagem"
+msgstr "Ex.: garagem"
+
+#: app.py:134
+msgid "E-mail"
+msgstr "E-mail"
+
+#: app.py:135
+msgid "Mensagem"
+msgstr "Mensagem"

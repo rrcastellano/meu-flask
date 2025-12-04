@@ -43,14 +43,15 @@ async function loadRecharges() {
 
     try {
         const response = await fetch(`/api/manage_recharges?${params.toString()}`);
-        if (!response.ok) throw new Error('Erro ao carregar recargas');
+        if (!response.ok) throw new Error(ErrorLoadingRecharges);
         const data = await response.json();
 
         const tbody = document.getElementById('recharges-body');
         tbody.innerHTML = '';
 
         if (data.items.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" class="text-center">Nenhuma recarga encontrada.</td></tr>';
+            tbody.innerHTML = `<tr><td colspan="8" class="text-center">${NoRechargesFound}</td></tr>`;
+            
         } else {
             data.items.forEach(item => {
                 const tr = document.createElement('tr');
@@ -59,20 +60,20 @@ async function loadRecharges() {
                     <td>${item.data}</td>
                     <td>${item.kwh}</td>
                     <td>R$ ${item.custo.toFixed(2)}</td>
-                    <td>${item.isento ? 'Sim' : 'Não'}</td>
+                    <td>${item.isento ? YesMessage : NoMessage}</td>
                     <td>${item.odometro}</td>
                     <td>${item.local || ''}</td>
                     <td title="${item.observacoes || ''}">${(item.observacoes || '').substring(0, 30)}${item.observacoes && item.observacoes.length > 30 ? '...' : ''}</td>
                     <td>
-                        <button class="btn btn-sm btn-outline-primary btn-edit">Editar</button>
-                        <button class="btn btn-sm btn-outline-danger btn-delete">Excluir</button>
+                        <button class="btn btn-sm btn-outline-primary btn-edit">${EditText}</button>
+                        <button class="btn btn-sm btn-outline-danger btn-delete">${DeleteText}</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        document.getElementById('pagination-info').textContent = `Exibindo ${(currentPage - 1) * pageSize + 1}–${Math.min(currentPage * pageSize, data.total)} de ${data.total}`;
+        document.getElementById('pagination-info').textContent = `${DisplayingText} ${(currentPage - 1) * pageSize + 1}–${Math.min(currentPage * pageSize, data.total)} ${OfText} ${data.total}`;
         document.getElementById('btn-prev-page').disabled = !data.has_prev;
         document.getElementById('btn-next-page').disabled = !data.has_next;
     } catch (error) {
@@ -171,10 +172,10 @@ document.getElementById('btn-save-edit').addEventListener('click', async () => {
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.error || 'Erro ao salvar edição');
+            throw new Error(errorData.error || ErrorSaveMessage);
         }
 
-        showToast('Recarga atualizada com sucesso!', 'success');
+        showToast(RechargeUpdatedSuccess, 'success');
         const editModal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
         editModal.hide();
         loadRecharges();
@@ -204,9 +205,9 @@ document.getElementById('btn-confirm-delete').addEventListener('click', async ()
             }
         });
 
-        if (!response.ok) throw new Error('Erro ao excluir recarga');
+        if (!response.ok) throw new Error(ErrorDeleteMessage);
 
-        showToast('Recarga excluída com sucesso!', 'success');
+        showToast(RechargeDeletedSuccess, 'success');
         const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
         deleteModal.hide();
         loadRecharges();

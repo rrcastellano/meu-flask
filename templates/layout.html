@@ -5,18 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   
-  <title>Gestão de Recargas</title>
+   <title>EVChargeLog.com</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/lux/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+    <!-- Implementação dos Favicons -->
+  <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/favicon-16x16.png') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="48x48" href="{{ url_for('static', filename='img/favicon-48x48.png') }}">
+  <link rel="icon" type="image/png" sizes="64x64" href="{{ url_for('static', filename='img/favicon-64x64.png') }}">
+  <link rel="icon" type="image/png" sizes="128x128" href="{{ url_for('static', filename='img/favicon-128x128.png') }}">
+  <link rel="icon" type="image/png" sizes="256x256" href="{{ url_for('static', filename='img/favicon-256x256.png') }}">
+  <!-- Adicione outras tags de ícones maiores para compatibilidade total se desejar -->
+
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
       {% if current_user.is_authenticated %}
-        <a class="navbar-brand" href="{{ url_for('dashboard') }}">Recargas</a>
+        <!-- <a class="navbar-brand" href="{{ url_for('dashboard') }}">Recargas</a> -->
+        <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+            <!-- Implementação do Logo -->
+            <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="EVChargeLog Logo" style="height: 60px; margin-right: 10px;">
+            EVChargeLog.com
+        </a>
       {% else %}
-        <a class="navbar-brand" href="{{ url_for('index') }}">Recargas</a>
+        <!-- <a class="navbar-brand" href="{{ url_for('index') }}">Recargas</a> -->
+        <a class="navbar-brand" href="{{ url_for('index') }}">
+          <!-- Implementação do Logo -->
+          <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="EVChargeLog Logo" style="height: 60px; margin-right: 10px;">
+          EVChargeLog.com
+      </a>
       {% endif %}
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,13 +46,13 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           {% if current_user.is_authenticated %}
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('recharge') }}">Nova Recarga</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('bulk_recharge') }}">Importar Recargas</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_recharges') }}">Histórico</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('account') }}">Configurações</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">Contato</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Sair</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">{{ _("Dashboard") }}</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('recharge') }}">{{ _("Nova Recarga") }}</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('bulk_recharge') }}">{{ _("Importar Recargas") }}</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_recharges') }}">{{ _("Histórico") }}</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('account') }}">{{ _("Configurações") }}</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">{{ _("Contato") }}</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">{{ _("Sair") }}</a></li>
           {% endif %}
         </ul>
       </div>
@@ -61,7 +82,14 @@
   </div>
 
   <footer class="text-center mt-4 mb-4">
-    <p>&copy; 2025 Gestão de Recargas</p>
+    <p>&copy; {{ _("2025 Gestão de Recargas") }}</p>
+    <div class="container language-switcher" style="text-align: center; margin-top: 20px; padding-bottom: 20px;">
+    <p>Idioma / Language:
+        <a href="{{ url_for(request.endpoint, lang='pt_BR', **request.view_args) }}">🇧🇷 Português</a> | 
+        <a href="{{ url_for(request.endpoint, lang='en', **request.view_args) }}"></i>🇺🇸 English</a> |
+        <a href="{{ url_for(request.endpoint, lang='es', **request.view_args) }}"></i>🇪🇸 Español</a>
+    </p>
+</div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

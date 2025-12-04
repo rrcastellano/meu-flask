@@ -1,32 +1,32 @@
 {% extends 'layout.html' %}
 {% block content %}
-<h2 class="page-title mb-4"><i class="fa fa-plus-circle me-2"></i> Registrar Recargas</h2>
+<h2 class="page-title mb-4"><i class="fa fa-plus-circle me-2"></i> {{ _("Registrar Recargas") }}</h2>
 <form method="POST" action="/recharge">
   {{ form.hidden_tag() }}
   <div class="mb-3">
-    <label for="data" class="form-label">Data</label>
+    <label for="data" class="form-label">{{ _("Data") }}</label>
     {{ form.data(class_='form-control', id='data') }}
   </div>
   <div class="mb-3">
-    <label for="kwh" class="form-label">kWh Carregados</label>
+    <label for="kwh" class="form-label">{{ _("kWh Carregados") }}</label>
     {{ form.kwh(class_='form-control', id='kwh') }}
   </div>
   <div class="mb-3">
-    <label for="custo" class="form-label">Custo (R$)</label>
+    <label for="custo" class="form-label">{{ _("Custo (R$)") }}</label>
     {{ form.custo(class_='form-control', id='custo') }}
   </div>
   <div class="mb-3">
-    <label for="odometro" class="form-label">Odômetro (km)</label>
+    <label for="odometro" class="form-label">{{ _("Odômetro (km)") }}</label>
     {{ form.odometro(class_='form-control', id='odometro') }}
   </div>
   <div class="mb-3">
-    <label for="local" class="form-label">Local</label>
+    <label for="local" class="form-label">{{ _("Local") }}</label>
     {{ form.local(class_='form-control', id='local') }}
   </div>
   <div class="mb-3">
-    <label for="observacoes" class="form-label">Observações</label>
+    <label for="observacoes" class="form-label">{{ _("Observações") }}</label>
     {{ form.observacoes(class_='form-control', id='observacoes') }}
   </div>
-  <button type="submit" class="btn btn-success">Salvar</button>
+  <button type="submit" class="btn btn-primary">{{ _("Salvar") }}</button>
 </form>
 {% endblock %}

@@ -2,50 +2,50 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="container-fluid">
-    <h2 class="page-title mb-4"><i class="fa fa-list-alt me-2"></i> Gerenciar Recargas</h2>
+    <h2 class="page-title mb-4"><i class="fa fa-list-alt me-2"></i> {{ _("Gerenciar Recargas") }}</h2>
     <!-- Card de Filtros -->
     <div class="card mb-4 shadow-sm">
         <div class="card-header bg-primary text-white">
-            <i class="fa fa-filter"></i> Filtros
+            <i class="fa fa-filter"></i> {{ _("Filtros") }}
         </div>
         <div class="card-body">
             <form id="filters-form" class="row g-3">
                 <div class="col-md-3">
                     <label for="filter-local" class="form-label">Local</label>
-                    <input type="text" id="filter-local" name="local" class="form-control" placeholder="Ex.: Shopping">
+                    <input type="text" id="filter-local" name="local" class="form-control" placeholder="{{ _l('Ex.: Shopping') }}">
                 </div>
                 <div class="col-md-3">
-                    <label for="filter-observacoes" class="form-label">Observações</label>
-                    <input type="text" id="filter-observacoes" name="observacoes" class="form-control" placeholder="Ex.: garagem">
+                    <label for="filter-observacoes" class="form-label">{{ _("Observações") }}</label>
+                    <input type="text" id="filter-observacoes" name="observacoes" class="form-control" placeholder="{{ _l('Ex.: garagem') }}">
                 </div>
                 <div class="col-md-2">
-                    <label for="filter-isento" class="form-label">Isento</label>
+                    <label for="filter-isento" class="form-label">{{ _("Isento") }}</label>
                     <select id="filter-isento" name="isento" class="form-select">
-                        <option value="all">Todos</option>
-                        <option value="true">Sim</option>
-                        <option value="false">Não</option>
+                        <option value="all">{{ _("Todos") }}</option>
+                        <option value="true">{{ _("Sim") }}</option>
+                        <option value="false">{{ _("Não") }}</option>
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <label for="filter-date-from" class="form-label">Data início</label>
+                    <label for="filter-date-from" class="form-label">{{ _("Data início") }}</label>
                     <input type="date" id="filter-date-from" name="date_from" class="form-control">
                 </div>
                 <div class="col-md-2">
-                    <label for="filter-date-to" class="form-label">Data fim</label>
+                    <label for="filter-date-to" class="form-label">{{ _("Data fim") }}</label>
                     <input type="date" id="filter-date-to" name="date_to" class="form-control">
                 </div>
                 <div class="col-12 d-flex justify-content-end gap-2 mt-3">
                     <button type="button" id="btn-apply-filters" class="btn btn-primary">
-                        <i class="fa fa-search"></i> Aplicar filtros
+                        <i class="fa fa-search"></i> {{ _("Aplicar filtros") }}
                     </button>
                     <button type="button" id="btn-clear-filters" class="btn btn-secondary">
-                        <i class="fa fa-eraser"></i> Limpar
+                        <i class="fa fa-eraser"></i> {{ _("Limpar") }}
                     </button>
                     <button type="button" id="btn-last-30-days" class="btn btn-outline-info">
-                        <i class="fa fa-clock"></i> Últimos 30 dias
+                        <i class="fa fa-clock"></i> {{ _("Últimos 30 dias") }}
                     </button>
                     <button type="button" id="btn-export" class="btn btn-success">
-                        <i class="fa fa-file-csv"></i> Exportar CSV
+                        <i class="fa fa-file-csv"></i> {{ _("Exportar CSV") }}
                     </button>
                 </div>
             </form>
@@ -60,20 +60,20 @@
     <!-- Tabela -->
     <div class="card shadow-sm">
         <div class="card-header bg-dark text-white">
-            <i class="fa fa-list"></i> Histórico de Recargas
+            <i class="fa fa-list"></i> {{ _("Histórico de Recargas") }}
         </div>
         <div class="card-body p-0">
             <table id="recharges-table" class="table table-striped table-hover align-middle mb-0">
                 <thead class="table-dark">
                     <tr>
-                        <th data-sort="data">Data</th>
-                        <th data-sort="kwh">kWh</th>
-                        <th data-sort="custo">Custo</th>
-                        <th data-sort="isento">Isento</th>
-                        <th data-sort="odometro">Odômetro</th>
-                        <th data-sort="local">Local</th>
-                        <th data-sort="observacoes">Observações</th>
-                        <th class="text-center">Ações</th>
+                        <th data-sort="data">{{ _("Data") }}</th>
+                        <th data-sort="kwh">{{ _("kWh") }}</th>
+                        <th data-sort="custo">{{ _("Custo") }}</th>
+                        <th data-sort="isento">{{ _("Isento") }}</th>
+                        <th data-sort="odometro">{{ _("Odômetro") }}</th>
+                        <th data-sort="local">{{ _("Local") }}</th>
+                        <th data-sort="observacoes">{{ _("Observações") }}</th>
+                        <th class="text-center">{{ _("Ações") }}</th>
                     </tr>
                 </thead>
                 <tbody id="recharges-body"></tbody>
@@ -83,13 +83,13 @@
 
     <!-- Paginação -->
     <div class="d-flex justify-content-between align-items-center mt-3">
-        <span id="pagination-info" class="badge bg-light text-dark">Exibindo 1–20 de 0</span>
+        <span id="pagination-info" class="badge bg-light text-dark">{{ _("Exibindo") }} 1–20 de 0</span>
         <div>
             <button id="btn-prev-page" class="btn btn-outline-primary btn-sm">
-                <i class="fa fa-chevron-left"></i> Anterior
+                <i class="fa fa-chevron-left"></i> {{ _("Anterior") }}
             </button>
             <button id="btn-next-page" class="btn btn-outline-primary btn-sm">
-                Próximo <i class="fa fa-chevron-right"></i>
+                {{ _("Próximo") }} <i class="fa fa-chevron-right"></i>
             </button>
         </div>
     </div>
@@ -101,7 +101,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-warning text-white">
-                <h-title" id="editModalLabel"><i class="fa fa-edit"></i> Editar Recarga</h5>
+                <h-title" id="editModalLabel"><i class="fa fa-edit"></i> {{ _("Editar Recarga") }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body">
@@ -111,41 +111,41 @@
                         <div class="col-md-4">
                             <label for="edit-data" class="formData *</label>
                             <input type="date" id="edit-data" name="data" class="form-control" required>
-                            <div class="invalid-feedback">Informe uma data válida.</div>
+                            <div class="invalid-feedback">{{ _("Informe uma data válida.") }}</div>
                         </div>
                         <div class="col-md-4">
-                            <label for="edit-kwh" class="form-label">kWh *</label>
+                            <label for="edit-kwh" class="form-label">{{ _("kWh") }} *</label>
                             <input type="number" step="0.01" id="edit-kwh" name="kwh" class="form-control" required>
-                            <div class="invalid-feedback">Informe um valor válido.</div>
+                            <div class="invalid-feedback">{{ _("Informe um valor válido.") }}</div>
                         </div>
                         <div class="col-md-4">
-                            <label for="edit-custo" class="form-label">Custo *</label>
+                            <label for="edit-custo" class="form-label">{{ _("Custo") }} *</label>
                             <input type="number" step="0.01" id="edit-custo" name="custo" class="form-control" required>
-                            <div class="invalid-feedback">Informe um valor válido.</div>
+                            <div class="invalid-feedback">{{ _("Informe um valor válido.") }}</div>
                         </div>
                         <div class="col-md-4">
-                            <label for="edit-odometro" class="form-label">Odômetro *</label>
+                            <label for="edit-odometro" class="form-label">{{ _("Odômetro") }} *</label>
                             <input type="number" step="0.1" id="edit-odometro" name="odometro" class="form-control" required>
-                            <div class="invalid-feedback">Informe um valor válido.</div>
+                            <div class="invalid-feedback">{{ _("Informe um valor válido.") }}</div>
                         </div>
                         <div class="col-md-4">
-                            <label for="edit-isento" class="form-label">Isento</label>
+                            <label for="edit-isento" class="form-label">{{ _("Isento") }}</label>
                             <input type="checkbox" id="edit-isento" name="isento" class="form-check-input">
                         </div>
                         <div class="col-md-6">
-                            <label for="edit-local" class="form-label">Local</label>
+                            <label for="edit-local" class="form-label">{{ _("Local") }}</label>
                             <input type="text" id="edit-local" name="local" class="form-control" maxlength="200">
                         </div>
                         <div class="col-md-12">
-                            <label for="edit-observacoes" class="form-label">Observações</label>
+                            <label for="edit-observacoes" class="form-label">{{ _("Observações") }}</label>
                             <textarea id="edit-observacoes" name="observacoes" class="form-control" rows="3" maxlength="2000"></textarea>
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" id="btn-save-edit" class="btn btn-primary">Salvar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _("Cancelar") }}</button>
+                <button type="button" id="btn-save-edit" class="btn btn-primary">{{ _("Salvar") }}</button>
             </div>
         </div>
     </div>
@@ -156,15 +156,15 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="deleteModalLabel"><i class="fa fa-trash"></i> Confirmar Exclusão</h5>
+                <h5 class="modal-title" id="deleteModalLabel"><i class="fa fa-trash"></i> {{ _("Confirmar Exclusão") }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body">
-                Tem certeza que deseja excluir esta recarga? Essa ação não pode ser desfeita.
+                {{ _("Tem certeza que deseja excluir esta recarga? Essa ação não pode ser desfeita.") }}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" id="btn-confirm-delete" class="btn btn-danger">Excluir</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _("Cancelar") }}</button>
+                <button type="button" id="btn-confirm-delete" class="btn btn-danger">{{ _("Excluir") }}</button>
             </div>
         </div>
     </div>
@@ -178,4 +178,25 @@
 
 {% block scripts %}
     <script src="{{ url_for('static', filename='manage_recharges.js') }}"></script>
+    <script>
+        // Define variáveis JS com os textos já traduzidos pelo Jinja/Babel
+        const YesMessage = "{{ _('Sim') }}";
+        const NoMessage = "{{ _('Não') }}";
+        const AllMessage = "{{ _('Todos') }}";
+
+        // Constantes de status e mensagens de erro/sucesso
+        const ErrorLoadingRecharges = "{{ _('Erro ao carregar recargas.') }}";
+        const NoRechargesFound = "{{ _('Nenhuma recarga encontrada.') }}";
+        const ErrorSaveMessage = "{{ _('Erro ao salvar edição.') }}";
+        const RechargeUpdatedSuccess = "{{ _('Recarga atualizada com sucesso!') }}";
+        const ErrorDeleteMessage = "{{ _('Erro ao excluir recarga.') }}";
+        const RechargeDeletedSuccess = "{{ _('Recarga excluída com sucesso!') }}";
+
+        // Constantes de ação/botões
+        const EditText = "{{ _('Editar') }}";
+        const DeleteText = "{{ _('Excluir') }}";
+        const DisplayingText = "{{ _('Exibindo') }}";
+        const OfText = "{{ _('de') }}";
+    </script>
+
 {% endblock %}

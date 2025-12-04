@@ -3,24 +3,24 @@
 <div class="row justify-content-center">
   <div class="col-md-6">
     <!-- <h2 class="text-center">Registrar</h2> -->
-    <h2 class="page-title mb-4"><i class="fa fa-user-plus me-2"></i> Registrar</h2>
+    <h2 class="page-title mb-4"><i class="fa fa-user-plus me-2"></i> {{ _("Registrar") }}</h2>
     <form method="POST" action="/register">
       {{ form.hidden_tag() }}
       <div class="mb-3">
-        <label for="nome" class="form-label">Nome</label>
+        <label for="nome" class="form-label">{{ _("Nome") }}</label>
         {{ form.nome(class_='form-control', id='nome') }}
       </div>
       <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
+        <label for="email" class="form-label">{{ _("Email") }}</label>
         {{ form.email(class_='form-control', id='email') }}
       </div>
       <div class="mb-3">
-        <label for="senha" class="form-label">Senha</label>
+        <label for="senha" class="form-label">{{ _("Senha") }}</label>
         {{ form.senha(class_='form-control', id='senha') }}
       </div>
-      <button type="submit" class="btn btn-primary w-100">Registrar</button>
+      <button type="submit" class="btn btn-primary w-100">{{ _("Registrar") }}</button>
     </form>
-    <p class="text-center mt-3">Já tem conta? <a href="/">Faça login</a></p>
+    <p class="text-center mt-3">{{ _("Já tem conta?") }} <a href="/">{{ _("Faça login") }}</a></p>
   </div>
 </div>
 {% endblock %}

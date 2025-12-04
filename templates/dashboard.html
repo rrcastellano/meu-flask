@@ -2,196 +2,196 @@
 
 {% block content %}
 <div class="container my-4">
-  <h2 class="page-title mb-4"><i class="fa fa-chart-line me-2"></i> Dashboard</h2>
+  <h2 class="page-title mb-4"><i class="fa fa-chart-line me-2"></i> {{ _("Dashboard") }}</h2>
 <!-- ===================== KPIs ===================== -->
 <div class="kpi-grid">
   <!-- Linha 1 -->
   <div class="kpi-card kpi-quantidade">
     <span class="kpi-info" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-          data-bs-placement="top" title="Recargas"
-          data-bs-content="Quantidade de recargas registradas no período.">
+          data-bs-placement="top" title="{{ _('Recargas') }}" 
+          data-bs-content="{{ _('Quantidade de recargas registradas no período.') }}">
       <i class="fas fa-info-circle"></i>
     </span>
     <i class="fas fa-bolt"></i>
-    <h6>Recargas</h6>
+    <h6>{{ _("Recargas") }}</h6>
     <p>{{ kpis.recargas | brl(0, False) }}</p>
   </div>
 
   <div class="kpi-card kpi-quantidade">
     <span class="kpi-info" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-          data-bs-placement="top" title="Recargas Isentas"
-          data-bs-content="Recargas gratuitas (isento = TRUE).">
+          data-bs-placement="top" title="{{ _('Recargas Isentas') }}"
+          data-bs-content="{{ _('Recargas gratuitas.') }}">
       <i class="fas fa-info-circle"></i>
     </span>
     <i class="fas fa-gift"></i>
-    <h6>Recargas Isentas</h6>
+    <h6>{{ _("Recargas Isentas") }}</h6>
     <p>{{ kpis.recargas_isentas_qtd | brl(0, False) }}</p>
   </div>
 
   <div class="kpi-card kpi-quantidade">
     <span class="kpi-info" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-          data-bs-placement="top" title="Recargas Pagas"
-          data-bs-content="Recargas pagas (isento = FALSE).">
+          data-bs-placement="top" title="{{ _('Recargas Pagas') }}"
+          data-bs-content="{{ _('Recargas pagas.') }}">
       <i class="fas fa-info-circle"></i>
     </span>
     <i class="fas fa-credit-card"></i>
-    <h6>Recargas Pagas</h6>
+    <h6>{{ _("Recargas Pagas") }}</h6>
     <p>{{ kpis.recargas_pagas_qtd | brl(0, False) }}</p>
   </div>
 
   <div class="kpi-card kpi-quantidade">
     <span class="kpi-info" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-          data-bs-placement="top" title="Km Rodados"
-          data-bs-content="Diferença entre o último e o primeiro odômetro no período.">
+          data-bs-placement="top" title="{{ _('Km Rodados') }}"
+          data-bs-content="{{ _('Diferença entre o último e o primeiro odômetro no período.') }}">
       <i class="fas fa-info-circle"></i>
     </span>
     <i class="fas fa-road"></i>
-    <h6>Km Rodados</h6>
+    <h6>{{ _("Km Rodados") }}</h6>
     <p>{{ kpis.total_km | brl(0, False) }} km</p>
   </div>
 
   <!-- Linha 2 -->
   <div class="kpi-card kpi-consumo">
     <span class="kpi-info" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-          data-bs-placement="top" title="Consumo / 100Km"
-          data-bs-content="Somatório de kWh ÷ Total de km × 100.">
+          data-bs-placement="top" title="{{ _('Consumo / 100Km') }}"
+          data-bs-content="{{ _('Somatório de kWh ÷ Total de km × 100.') }}">
       <i class="fas fa-info-circle"></i>
     </span>
     <i class="fas fa-tachometer-alt"></i>
-    <h6>Consumo / 100Km</h6>
+    <h6>{{ _("Consumo / 100Km") }}</h6>
     <p>{{ kpis.consumo_por_100km | brl(2, False) }} kWh</p>
   </div>
 
   <div class="kpi-card kpi-custo">
     <span class="kpi-info" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-          data-bs-placement="top" title="Custo Médio / kWh"
-          data-bs-content="Custo total ÷ kWh total.">
+          data-bs-placement="top" title="{{ _('Custo Médio / kWh') }}"
+          data-bs-content="{{ _('Custo total ÷ kWh total.') }}">
       <i class="fas fa-info-circle"></i>
     </span>
     <i class="fas fa-battery-half"></i>
-    <h6>Custo Médio / kWh</h6>
+    <h6>{{ _("Custo Médio / kWh") }}</h6>
     <p>{{ kpis.custo_medio_kwh | brl(3) }}</p>
   </div>
 
   <div class="kpi-card kpi-custo">
     <span class="kpi-info" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-          data-bs-placement="top" title="Custo Médio / Km"
-          data-bs-content="Custo total ÷ km rodados.">
+          data-bs-placement="top" title="{{ _('Custo Médio / Km') }}"
+          data-bs-content="{{ _('Custo total ÷ km rodados.') }}">
       <i class="fas fa-info-circle"></i>
     </span>
     <i class="fas fa-ruler-horizontal"></i>
-    <h6>Custo Médio / Km</h6>
+    <h6>{{ _("Custo Médio / Km") }}</h6>
     <p>{{ kpis.custo_medio_km | brl(3) }}</p>
   </div>
 
   <div class="kpi-card kpi-custo">
     <span class="kpi-info" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-          data-bs-placement="top" title="Custo Gasolina / Km"
-          data-bs-content="Preço da gasolina ÷ consumo (km/l).">
+          data-bs-placement="top" title="{{ _('Custo Gasolina / Km') }}"
+          data-bs-content="{{ _('Preço da gasolina ÷ consumo (km/l).') }}">
       <i class="fas fa-info-circle"></i>
     </span>
     <i class="fas fa-gas-pump"></i>
-    <h6>Custo Gasolina / Km</h6>
+    <h6>{{ _("Custo Gasolina / Km") }}</h6>
     <p>{{ kpis.custo_gas_por_km | brl(3) }}</p>
   </div>
 
   <!-- Linha 3 -->
   <div class="kpi-card kpi-custo">
     <span class="kpi-info" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-          data-bs-placement="top" title="Custo Total"
-          data-bs-content="Somatório dos custos (inclui isentas).">
+          data-bs-placement="top" title="{{ _('Custo Total') }}"
+          data-bs-content="{{ _('Somatório dos custos (inclui isentas).') }}">
       <i class="fas fa-info-circle"></i>
     </span>
     <i class="fas fa-wallet"></i>
-    <h6>Custo Total</h6>
+    <h6>{{ _("Custo Total") }}</h6>
     <p>{{ kpis.custo_total | brl(2) }}</p>
   </div>
 
   <div class="kpi-card kpi-custo">
     <span class="kpi-info" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-          data-bs-placement="top" title="Recargas Isentas (R$)"
-          data-bs-content="Somatório do custo com isento = TRUE.">
+          data-bs-placement="top" title="{{ _('Recargas Isentas (R$)') }}"
+          data-bs-content="{{ _('Somatório do custo com isento.') }}">
       <i class="fas fa-info-circle"></i>
     </span>
     <i class="fas fa-gift"></i>
-    <h6>Recargas Isentas (R$)</h6>
+    <h6>{{ _("Recargas Isentas (R$)") }}</h6>
     <p>{{ kpis.custo_isentas | brl(2) }}</p>
   </div>
 
   <div class="kpi-card kpi-custo">
     <span class="kpi-info" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-          data-bs-placement="top" title="Recargas Pagas (R$)"
-          data-bs-content="Somatório do custo com isento = FALSE.">
+          data-bs-placement="top" title="{{ _('Recargas Pagas (R$)') }}"
+          data-bs-content="{{ _('Somatório do custo com isento.') }}">
       <i class="fas fa-info-circle"></i>
     </span>
     <i class="fas fa-credit-card"></i>
-    <h6>Recargas Pagas (R$)</h6>
+    <h6>{{ _("Recargas Pagas (R$)") }}</h6>
     <p>{{ kpis.custo_pagas | brl(2) }}</p>
   </div>
 
   <div class="kpi-card kpi-consumo">
     <span class="kpi-info" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-          data-bs-placement="top" title="Consumo Total"
-          data-bs-content="Somatório de kWh (isentas e pagas).">
+          data-bs-placement="top" title="{{ _('Consumo Total') }}"
+          data-bs-content="{{ _('Somatório de kWh (isentas e pagas).') }}">
       <i class="fas fa-info-circle"></i>
     </span>
     <i class="fas fa-battery-full"></i>
-    <h6>Consumo Total</h6>
+    <h6>{{ _("Consumo Total") }}</h6>
     <p>{{ kpis.consumo_total_kwh | brl(2, False) }} kWh</p>
   </div>
 
   <!-- Linha 4 -->
   <div class="kpi-card kpi-economia">
     <span class="kpi-info" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-          data-bs-placement="top" title="Economia (Custo)"
-          data-bs-content="Custo simulado da gasolina − Custo total.">
+          data-bs-placement="top" title="{{ _('Economia (Custo)') }}"
+          data-bs-content="{{ _('Custo simulado da gasolina − Custo total.') }}">
       <i class="fas fa-info-circle"></i>
     </span>
     <i class="fas fa-piggy-bank"></i>
-    <h6>Economia (Custo)</h6>
+    <h6>{{ _("Economia (Custo)") }}</h6>
     <p>{{ kpis.economia_total | brl(2) }}</p>
   </div>
 
   <div class="kpi-card kpi-economia">
     <span class="kpi-info" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-          data-bs-placement="top" title="Economia (Custo) / Km"
-          data-bs-content="Economia total ÷ km rodados.">
+          data-bs-placement="top" title="{{ _('Economia (Custo) / Km') }}"
+          data-bs-content="{{ _('Economia total ÷ km rodados.') }}">
       <i class="fas fa-info-circle"></i>
     </span>
     <i class="fas fa-chart-line"></i>
-    <h6>Economia (Custo) / Km</h6>
+    <h6>{{ _("Economia (Custo) / Km") }}</h6>
     <p>{{ kpis.economia_total_por_km | brl(3) }}</p>
   </div>
 
   <div class="kpi-card kpi-economia">
     <span class="kpi-info" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-          data-bs-placement="top" title="Economia (Pagas)"
-          data-bs-content="Custo simulado da gasolina − Custo das recargas pagas.">
+          data-bs-placement="top" title="{{ _('Economia (Pagas)') }}"
+          data-bs-content="{{ _('Custo simulado da gasolina − Custo das recargas pagas.') }}">
       <i class="fas fa-info-circle"></i>
     </span>
     <i class="fas fa-hand-holding-usd"></i>
-    <h6>Economia (Pagas)</h6>
+    <h6>{{ _("Economia (Pagas)") }}</h6>
     <p>{{ kpis.economia_pagas | brl(2) }}</p>
   </div>
 
   <div class="kpi-card kpi-economia">
     <span class="kpi-info" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-          data-bs-placement="top" title="Economia (Pagas) / Km"
-          data-bs-content="Economia (pagas) ÷ km rodados.">
+          data-bs-placement="top" title="{{ _('Economia (Pagas) / Km') }}"
+          data-bs-content="{{ _('Economia (pagas) ÷ km rodados.') }}">
       <i class="fas fa-info-circle"></i>
     </span>
     <i class="fas fa-chart-bar"></i>
-    <h6>Economia (Pagas) / Km</h6>
+    <h6>{{ _("Economia (Pagas) / Km") }}</h6>
     <p>{{ kpis.economia_pagas_por_km | brl(3) }}</p>
   </div>
 </div>
 
   <!-- ===================== GRÁFICOS ===================== -->
   <div class="dashboard-charts">
-    <div class="chart-card"><h6>Custos por Mês</h6><div class="chart-container"><canvas id="chartCustos"></canvas></div></div>
-    <div class="chart-card"><h6>Valores Economizados por Mês</h6><div class="chart-container"><canvas id="chartEconomia"></canvas></div></div>
-    <div class="chart-card"><h6>Consumo por Mês (kWh)</h6><div class="chart-container"><canvas id="chartConsumo"></canvas></div></div>
-    <div class="chart-card"><h6>Km Rodados por Mês</h6><div class="chart-container"><canvas id="chartKm"></canvas></div></div>
+    <div class="chart-card"><h6>{{ _("Custos por Mês") }}</h6><div class="chart-container"><canvas id="chartCustos"></canvas></div></div>
+    <div class="chart-card"><h6>{{ _("Valores Economizados por Mês") }}</h6><div class="chart-container"><canvas id="chartEconomia"></canvas></div></div>
+    <div class="chart-card"><h6>{{ _("Consumo por Mês (kWh)") }}</h6><div class="chart-container"><canvas id="chartConsumo"></canvas></div></div>
+    <div class="chart-card"><h6>{{ _("Km Rodados por Mês") }}</h6><div class="chart-container"><canvas id="chartKm"></canvas></div></div>
 
   </div>
 </div>
@@ -202,4 +202,29 @@
 <script>
 {% include 'partials/dashboard_charts.js' %}
 </script>
+
+<script>
+  // Constantes de status e mensagens de erro/sucesso
+  const LoadMonthlyDataErrorMessage = "{{ _('Falha ao carregar dados mensais:') }}";
+  const LoadDataUnavailableMessage = "{{ _('Não foi possível carregar os dados.') }}";
+  const NoDataToDisplayMessage = "{{ _('Sem dados para exibir.') }}";
+
+  // Constantes gerais (moeda e localidade)
+  const CurrencySymbolBRL = "{{ _('R$') }}";
+  const LocaleCodePtBR = "{{ _('pt-BR') }}";
+
+  // Rótulos para Gráficos
+  const LabelTotalCostBRL = "{{ _('Custo Total (R$)') }}";
+  const LabelPaidRechargesBRL = "{{ _('Recargas Pagas (R$)') }}";
+  const LabelPercentPaidOverTotal = "{{ _('% Pagas sobre Total') }}";
+  const LabelKWhInMonth = "{{ _('kWh no mês') }}";
+  const LabelConsumptionPer100Km = "{{ _('Consumo / 100Km') }}";
+  const LabelKWh = "{{ _('kWh') }}";
+  const LabelKWhPer100Km = "{{ _('kWh / 100Km') }}";
+  const LabelKmInMonth = "{{ _('Km no mês') }}";
+  const LabelKm = "{{ _('Km') }}";
+  const LabelTotalSavingsBRL = "{{ _('Economia Total (R$)') }}";
+  const LabelPaidSavingsBRL = "{{ _('Economia (Pagas) (R$)') }}";
+</script>
+
 {% endblock %}

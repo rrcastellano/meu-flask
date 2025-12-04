@@ -6,9 +6,9 @@
     const res = await fetch("{{ url_for('api_recharges_monthly') }}");
     apiData = await res.json();
   } catch (err) {
-    console.error("Falha ao carregar dados mensais:", err);
+    console.error(LoadMonthlyDataErrorMessage, err);
     document.querySelectorAll('.chart-container').forEach(el => {
-      el.innerHTML = '<div class="text-muted">Não foi possível carregar os dados.</div>';
+      el.innerHTML = `<div class="text-muted">${LoadDataUnavailableMessage}</div>`;
     });
     return;
   }
@@ -16,7 +16,7 @@
   // Se não houver dados
   if (!apiData || !apiData.labels || apiData.labels.length === 0) {
     document.querySelectorAll('.chart-container').forEach(el => {
-      el.innerHTML = '<div class="text-muted">Sem dados para exibir.</div>';
+      el.innerHTML = `<div class="text-muted">${NoDataToDisplayMessage}</div>`;
     });
     return;
   }
@@ -25,8 +25,8 @@
   const labels = apiData.labels.map(m => `${m.slice(5, 7)}/${m.slice(0, 4)}`);
 
   // Helpers de formatação
-  const fmtBRL = v => 'R$ ' + Number(v ?? 0).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-  const fmtNum = v => Number(v ?? 0).toLocaleString('pt-BR', {maximumFractionDigits: 2});
+  const fmtBRL = v => CurrencySymbolBRL + ' ' + Number(v ?? 0).toLocaleString(LocaleCodePtBR, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  const fmtNum = v => Number(v ?? 0).toLocaleString(LocaleCodePtBR, {maximumFractionDigits: 2});
 
   // ============ Gráfico 1: Custos por Mês ============ //
   new Chart(document.getElementById('chartCustos'), {
@@ -35,7 +35,7 @@
       labels,
       datasets: [
         {
-          label: 'Custo Total (R$)',
+          label: LabelTotalCostBRL,
           data: apiData.custos.total,
           backgroundColor: 'rgba(13,110,253,0.6)',
           borderColor: 'rgba(13,110,253,1)',
@@ -43,7 +43,7 @@
           yAxisID: 'y'
         },
         {
-          label: 'Recargas Pagas (R$)',
+          label: LabelPaidRechargesBRL,
           data: apiData.custos.pagas,
           backgroundColor: 'rgba(25,135,84,0.6)',
           borderColor: 'rgba(25,135,84,1)',
@@ -52,7 +52,7 @@
         },
         {
           type: 'line',
-          label: '% Pagas sobre Total',
+          label: LabelPercentPaidOverTotal,
           data: apiData.custos.percentual,
           borderColor: 'rgba(255,193,7,1)',
           backgroundColor: 'rgba(255,193,7,0.2)',
@@ -68,7 +68,7 @@
       scales: {
         y: {
           position: 'left',
-          title: { display: true, text: 'R$' },
+          title: { display: true, text: CurrencySymbolBRL },
           ticks: { callback: value => fmtBRL(value) },
           beginAtZero: true
         },
@@ -106,7 +106,7 @@ new Chart(document.getElementById('chartConsumo'), {
     labels,
     datasets: [
       {
-        label: 'kWh no mês',
+        label: LabelKWhInMonth,
         data: apiData.consumo,
         backgroundColor: 'rgba(255,193,7,0.6)',
         borderColor: 'rgba(255,193,7,1)',
@@ -115,7 +115,7 @@ new Chart(document.getElementById('chartConsumo'), {
       },
       {
         type: 'line',
-        label: 'Consumo / 100Km',
+        label: LabelKWhPer100Km,
         data: apiData.consumo_por_100km,
         borderColor: 'rgba(13,110,253,1)',
         backgroundColor: 'rgba(13,110,253,0.2)',
@@ -137,7 +137,7 @@ new Chart(document.getElementById('chartConsumo'), {
       },
       y2: {
         position: 'right',
-        title: { display: true, text: 'kWh / 100Km' },
+        title: { display: true, text: LabelKWhPer100Km },
         ticks: { callback: value => fmtNum(value) },
         beginAtZero: true,
         grid: { drawOnChartArea: false }
@@ -149,7 +149,7 @@ new Chart(document.getElementById('chartConsumo'), {
           label: ctx => {
             const dsLabel = ctx.dataset.label || '';
             const v = ctx.raw;
-            const unidade = ctx.dataset.yAxisID === 'y' ? 'kWh' : 'kWh/100Km';
+            const unidade = ctx.dataset.yAxisID === 'y' ? 'kWh' : LabelKWhPer100Km;
             return `${dsLabel}: ${fmtNum(v)} ${unidade}`;
           }
         }
@@ -166,7 +166,7 @@ new Chart(document.getElementById('chartConsumo'), {
     data: {
       labels,
       datasets: [{
-        label: 'Km no mês',
+        label: LabelKmInMonth,
         data: apiData.km,
         backgroundColor: 'rgba(33,37,41,0.6)',
         borderColor: 'rgba(33,37,41,1)',
@@ -177,13 +177,13 @@ new Chart(document.getElementById('chartConsumo'), {
       responsive: true,
       scales: {
         y: {
-          title: { display: true, text: 'Km' },
+          title: { display: true, text: LabelKm },
           ticks: { callback: value => fmtNum(value) },
           beginAtZero: true
         }
       },
       plugins: {
-        tooltip: { callbacks: { label: c => `${c.dataset.label}: ${fmtNum(c.raw)} km` } },
+        tooltip: { callbacks: { label: c => `${c.dataset.label}: ${fmtNum(c.raw)} ${LabelKm}` } },
         legend: { position: 'bottom' }
       }
     }
@@ -196,14 +196,14 @@ new Chart(document.getElementById('chartConsumo'), {
       labels,
       datasets: [
         {
-          label: 'Economia Total (R$)',
+          label: LabelTotalSavingsBRL,
           data: apiData.economia.total,
           backgroundColor: 'rgba(253,126,20,0.6)',
           borderColor: 'rgba(253,126,20,1)',
           borderWidth: 1
         },
         {
-          label: 'Economia (Pagas) (R$)',
+          label: LabelPaidSavingsBRL,
           data: apiData.economia.pagas,
           backgroundColor: 'rgba(108,117,125,0.6)',
           borderColor: 'rgba(108,117,125,1)',
@@ -215,7 +215,7 @@ new Chart(document.getElementById('chartConsumo'), {
       responsive: true,
       scales: {
         y: {
-          title: { display: true, text: 'R$' },
+          title: { display: true, text: CurrencySymbolBRL },
           ticks: { callback: value => fmtBRL(value) },
           beginAtZero: true
         }

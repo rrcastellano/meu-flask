@@ -1,11 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, Response
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, Response, g, session
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_mail import Mail, Message
-from werkzeug.security import generate_password_hash, check_password_hash
-import sqlite3
+from flask_babel import Babel, gettext as _, lazy_gettext as _l
 from flask_wtf import CSRFProtect, FlaskForm
+import sqlite3
 from wtforms import StringField, PasswordField, FloatField, DateField, TextAreaField, FileField, BooleanField, EmailField, SubmitField 
 from wtforms.validators import DataRequired, Email, Length, NumberRange
+from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import csv
 import io
@@ -13,25 +14,65 @@ import os
 from collections import defaultdict
 from datetime import datetime
 
-
+# ----------------- CONFIGURAÇÕES INICIAIS DO FLASK -----------------
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "default_key")
 
+# Adicione este bloco no app.py:
+@app.context_processor
+def inject_int_functions():
+    """Injeta as funções de tradução _ e _l em todos os templates Jinja."""
+    return dict(_=_, _l=_l)
 
-# Configuração do Gmail SMTP
+
+# ----------------- Configuração do Gmail SMTP -----------------
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')  # seu email
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')  # app password
-
 mail = Mail(app)
 
 
+# ----------------- Configuração do Babel para internacionalização -----------------
+app.config['LANGUAGES'] = ['pt_BR', 'en', 'es'] # Adicione os idiomas suportados
+app.config['BABEL_DEFAULT_LOCALE'] = 'en' # Define o Inglês como padrão (fallback)
+app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations' # Diretório das traduções
+#babel = Babel(app)
+
+# Salva 'lang' da URL na sessão antes de cada request
+@app.before_request
+def set_language_from_query():
+    lang = request.args.get('lang')
+    if lang in app.config.get('LANGUAGES', []):
+        session['lang'] = lang
+
+# Função usada pelo Flask-Babel v4
+def get_locale():
+    # 1) Sessão (se o usuário trocou pelo link)
+    lang = session.get('lang')
+    if lang in app.config.get('LANGUAGES', []):
+        return lang
+
+    # 2) Se estiver logado e você guardar preferência no user (opcional)
+    user = getattr(g, 'user', None)
+    if user and getattr(user, 'locale', None) in app.config['LANGUAGES']:
+        return user.locale
+
+    # 3) Cabeçalho do navegador
+    return request.accept_languages.best_match(app.config['LANGUAGES'])
+
+# Mantém a inicialização do Babel com o selector
+babel = Babel(app, locale_selector=get_locale)
+
+
+# ----------------- Proteção CSRF -----------------
 csrf = CSRFProtect(app)
 
+# ----------------- Configuração do Flask-Login -----------------
 login_manager = LoginManager(app)
 login_manager.login_view = "index"
+
 
 # ----------------- MODELO DE USUÁRIO -----------------
 class User(UserMixin):
@@ -53,64 +94,98 @@ def load_user(user_id):
 
 # ----------------- FORMULÁRIOS -----------------
 class LoginForm(FlaskForm):
-    email = StringField("Email", validators=[DataRequired(), Email()])
-    senha = PasswordField("Senha", validators=[DataRequired()])
+    # Rótulos marcados para tradução
+    email = StringField(_l("Email"), validators=[DataRequired(), Email()])
+    senha = PasswordField(_l("Senha"), validators=[DataRequired()])
+    submit = SubmitField(_l("Login")) # Adicionei um botão de submit para ser traduzido também
 
 class RegisterForm(FlaskForm):
-    nome = StringField("Nome", validators=[DataRequired(), Length(min=2, max=100)])
-    email = StringField("Email", validators=[DataRequired(), Email()])
-    senha = PasswordField("Senha", validators=[DataRequired(), Length(min=6)])
+    # Rótulos marcados para tradução
+    nome = StringField(_l("Nome"), validators=[DataRequired(), Length(min=2, max=100)])
+    email = StringField(_l("Email"), validators=[DataRequired(), Email()])
+    senha = PasswordField(_l("Senha"), validators=[DataRequired(), Length(min=6)])
+    submit = SubmitField(_l("Registrar")) # Adicionei um botão de submit
 
 class RechargeForm(FlaskForm):
-    data = DateField("Data", validators=[DataRequired()])
-    kwh = FloatField("kWh", validators=[DataRequired(), NumberRange(min=0.01)])
-    custo = FloatField("Custo", validators=[DataRequired(), NumberRange(min=0.0)])
-    isento = BooleanField("Isento")  # ✅ Campo adicionado
-    odometro = FloatField("Odômetro", validators=[DataRequired(), NumberRange(min=0.1)])
-    local = StringField("Local")
-    observacoes = TextAreaField("Observações")
+    # Rótulos marcados para tradução
+    data = DateField(_l("Data"), validators=[DataRequired()])
+    kwh = FloatField(_l("kWh"), validators=[DataRequired(), NumberRange(min=0.01)])
+    custo = FloatField(_l("Custo"), validators=[DataRequired(), NumberRange(min=0.0)])
+    isento = BooleanField(_l("Isento"))
+    odometro = FloatField(_l("Odômetro"), validators=[DataRequired(), NumberRange(min=0.1)])
+    local = StringField(_l("Local"))
+    observacoes = TextAreaField(_l("Observações"))
+    submit = SubmitField(_l("Salvar Recarga")) # Adicionei um botão de submit
 
 class AccountForm(FlaskForm):
-    preco_gasolina = FloatField("Preço da Gasolina", validators=[DataRequired(), NumberRange(min=0.0)])
-    consumo_km_l = FloatField("Consumo Médio (km/l)", validators=[DataRequired(), NumberRange(min=0.1)])
+    # Rótulos marcados para tradução
+    preco_gasolina = FloatField(_l("Preço da Gasolina"), validators=[DataRequired(), NumberRange(min=0.0)])
+    consumo_km_l = FloatField(_l("Consumo Médio (km/l)"), validators=[DataRequired(), NumberRange(min=0.1)])
+    submit = SubmitField(_l("Atualizar Configurações")) # Adicionei um botão de submit
 
 class BulkRechargeForm(FlaskForm):
-    file = FileField("Arquivo CSV", validators=[DataRequired()])
-
+    # Rótulos marcados para tradução
+    file = FileField(_l("Arquivo CSV"), validators=[DataRequired()])
+    submit = SubmitField(_l("Importar")) # Adicionei um botão de submit
 
 class ContactForm(FlaskForm):
-    nome = StringField('Nome', validators=[DataRequired()])
-    email = StringField('E-mail', validators=[DataRequired(), Email()])
-    mensagem = TextAreaField('Mensagem', validators=[DataRequired()])
-    submit = SubmitField('Enviar')
+    # Rótulos marcados para tradução
+    nome = StringField(_l('Nome'), validators=[DataRequired()])
+    email = StringField(_l('E-mail'), validators=[DataRequired(), Email()])
+    mensagem = TextAreaField(_l('Mensagem'), validators=[DataRequired()])
+    submit = SubmitField(_l('Enviar'))
 
 
-
-# ----------------- FUNÇÃO AUXILIAR FORMATAR NÚMEROS -----------------
-def usd(value, digitos=2):
-    """Format value as USD."""
-    try:
-        v = float(value)
-        # separador de milhar (.) e decimal (,)
-        s = f"{v:,.{digitos}f}"
-        return f"$ {s}" if com_prefixo else s
-    except (ValueError, TypeError):
-        # fallback visual quando não há valor numérico
-        return "-"
-
+# ----------------- FUNÇÃO AUXILIAR FORMATAR NÚMEROS (AUTO por idioma) -----------------
 def brl(value, digitos=2, com_prefixo=True):
-    """Formata números no padrão brasileiro; opcionalmente prefixa com R$."""
+    """
+    Formata números conforme o idioma atual:
+      - pt_BR  -> padrão brasileiro (R$ 1.234,56)
+      - outros -> padrão americano (US$ 1,234.56)
+    Parâmetros:
+      value: número a formatar (int/float/string numérica)
+      digitos: casas decimais
+      com_prefixo: se True, exibe 'R$ ' (pt_BR) ou '$ ' (demais); se False, só o número
+    """
     try:
         v = float(value)
-        # separador de milhar (.) e decimal (,)
-        s = f"{v:,.{digitos}f}".replace(",", "X").replace(".", ",").replace("X", ".")
-        return f"R$ {s}" if com_prefixo else s
     except (ValueError, TypeError):
         # fallback visual quando não há valor numérico
         return "-"
 
-app.jinja_env.filters["usd"] = usd
+    # Tenta obter o locale atual do Babel; cai para sessão/browser se necessário
+    try:
+        # get_locale foi definido no seu app e passado ao Babel como locale_selector
+        lang = None
+        # 1) sessão (se você troca via ?lang=)
+        lang = session.get('lang')
+        # 2) Babel (selector)
+        if not lang:
+            # Se get_locale existe, usa
+            try:
+                lang = str(get_locale())
+            except Exception:
+                lang = None
+        # 3) cabeçalho do navegador (fallback)
+        if not lang and request is not None:
+            lang = request.accept_languages.best_match(app.config.get('LANGUAGES', []))
+    except Exception:
+        lang = None
+
+    # Formata em string com separadores padrão US
+    s_us = f"{v:,.{digitos}f}"  # ex.: 1234.56 -> "1,234.56"
+
+    if lang == 'pt_BR':
+        # Converte para padrão brasileiro: milhar '.' e decimal ','
+        s_br = s_us.replace(",", "X").replace(".", ",").replace("X", ".")
+        return f"R$ {s_br}" if com_prefixo else s_br
+    else:
+        # Mantém padrão americano
+        return f"$ {s_us}" if com_prefixo else s_us
+
+# Atualiza/registrar filtro único 'brl' no Jinja (substitui os anteriores)
 app.jinja_env.filters["brl"] = brl
+
 
 
 # ----------------- FUNÇÃO AUXILIAR PARA CSV -----------------
@@ -132,7 +207,7 @@ def validate_csv_and_parse(file_storage):
         file_storage.stream.seek(0)
         raw = file_storage.read()
     except Exception as e:
-        return [], [f"Erro ao ler arquivo: {e}"]
+        return [], [_(f"Erro ao ler arquivo: {e}")]
 
     # Decodificação com fallback
     try:
@@ -167,22 +242,22 @@ def validate_csv_and_parse(file_storage):
     try:
         reader = csv.DictReader(stream, delimiter=delimiter)
     except Exception as e:
-        return [], [f"Erro ao preparar leitor CSV: {e}"]
+        return [], [_(f"Erro ao preparar leitor CSV: {e}")]
 
     # Validar cabeçalhos
     if not reader.fieldnames:
-        return [], ["Arquivo CSV sem cabeçalho."]
+        return [], [_("Arquivo CSV sem cabeçalho.")]
 
     reader.fieldnames = [(h or "").strip().lower().replace('\ufeff', '') for h in reader.fieldnames]
 
     required_headers = ['data', 'kwh', 'custo', 'isento', 'odometro', 'local', 'observacoes']
     missing = [h for h in required_headers if h not in reader.fieldnames]
     if missing:
-        return [], [
+        return [], [_(
             "Cabeçalhos inválidos.",
             "Esperado: " + ", ".join(required_headers),
             "Ausentes: " + ", ".join(missing)
-        ]
+        )]
 
     # --- Processar linhas ---
     line_num = 1
@@ -194,7 +269,7 @@ def validate_csv_and_parse(file_storage):
         try:
             data = (row.get('data') or "").strip()
             if not data:
-                raise ValueError("Campo 'data' vazio.")
+                raise ValueError(_("Campo 'data' vazio."))
 
             kwh = float((row.get('kwh') or "").replace(',', '.'))
             custo = float((row.get('custo') or "").replace(',', '.'))
@@ -217,12 +292,12 @@ def validate_csv_and_parse(file_storage):
             })
 
         except ValueError as ve:
-            err_msgs.append(f"Linha {line_num}: {ve}. Conteúdo: {row}")
+            err_msgs.append(_(f"Linha {line_num}: {ve}. Conteúdo: {row}"))
         except Exception as e:
-            err_msgs.append(f"Linha {line_num}: erro inesperado: {e}. Conteúdo: {row}")
+            err_msgs.append(_(f"Linha {line_num}: erro inesperado: {e}. Conteúdo: {row}"))
 
     if not rows_validos and not err_msgs:
-        err_msgs.append("Nenhuma linha válida foi encontrada no CSV.")
+        err_msgs.append(_("Nenhuma linha válida foi encontrada no CSV."))
 
     return rows_validos, err_msgs
 
@@ -248,14 +323,14 @@ def login():
         if row and check_password_hash(row[3], senha):
             user = User(row[0], row[1], row[2])
             login_user(user)
-            flash("Login realizado com sucesso!", "success")
+            flash(_("Login realizado com sucesso!"), "success")
             return redirect(url_for("dashboard"))
         else:
-            flash("Credenciais inválidas.", "danger")
+            flash(_("Credenciais inválidas."), "danger")
             return redirect(url_for("index"))
     for field, errors in form.errors.items():
         for err in errors:
-            flash(f"Erro em {field}: {err}", "danger")
+            flash(_(f"Erro em {field}: {err}"), "danger")
     return redirect(url_for("index"))
 
 @app.route("/register", methods=["GET", "POST"])
@@ -271,23 +346,23 @@ def register():
             try:
                 cursor.execute("INSERT INTO users (nome, email, senha_hash) VALUES (?, ?, ?)", (nome, email, senha_hash))
                 conn.commit()
-                flash("Conta criada com sucesso! Faça login.", "success")
+                flash(_("Conta criada com sucesso! Faça login."), "success")
                 return redirect(url_for("index"))
             except sqlite3.IntegrityError:
-                flash("Email já cadastrado.", "danger")
+                flash(_("Email já cadastrado."), "danger")
             finally:
                 conn.close()
         else:
             for field, errors in form.errors.items():
                 for err in errors:
-                    flash(f"Erro em {field}: {err}", "danger")
+                    flash(_(f"Erro em {field}: {err}"), "danger")
     return render_template("register.html", form=form)
 
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
-    flash("Você saiu da conta.", "info")
+    flash(_("Você saiu da conta."), "info")
     return redirect(url_for("index"))
 
 @app.route("/recharge", methods=["GET", "POST"])
@@ -311,12 +386,12 @@ def recharge():
             """, (int(current_user.id), data, kwh, custo, isento, odometro, local, observacoes))
             conn.commit()
             conn.close()
-            flash("Recarga registrada com sucesso!", "success")
+            flash(_("Recarga registrada com sucesso!"), "success")
             return redirect(url_for("dashboard"))
         else:
             for field, errors in form.errors.items():
                 for err in errors:
-                    flash(f"Erro em {field}: {err}", "danger")
+                    flash(_(f"Erro em {field}: {err}"), "danger")
     return render_template("recharge.html", form=form)
 
 
@@ -356,18 +431,18 @@ def bulk_recharge():
                 ))
                 count_ok += 1
             except Exception as e:
-                flash(f"Falha ao inserir linha: {r}. Detalhes: {e}", "warning")
+                flash(_(f"Falha ao inserir linha: {r}. Detalhes: {e}"), "warning")
 
         conn.commit()
         conn.close()
 
-        flash(f"Importação concluída. {count_ok} recarga(s) adicionada(s).", "success")
+        flash(_(f"Importação concluída. {count_ok} recarga(s) adicionada(s)."), "success")
         return redirect(url_for("dashboard"))
 
     else:
         for field, errs in form.errors.items():
             for err in errs:
-                flash(f"Erro em {field}: {err}", "danger")
+                flash(_(f"Erro em {field}: {err}"), "danger")
 
     return render_template("bulk_recharge.html", form=form)
 
@@ -392,12 +467,12 @@ def account():
                                (int(current_user.id), preco_gasolina, consumo_km_l))
             conn.commit()
             conn.close()
-            flash("Configurações atualizadas com sucesso!", "success")
+            flash(_("Configurações atualizadas com sucesso!"), "success")
             return redirect(url_for("dashboard"))
         else:
             for field, errors in form.errors.items():
                 for err in errors:
-                    flash(f"Erro em {field}: {err}", "danger")
+                    flash(_(f"Erro em {field}: {err}"), "danger")
     cursor.execute("SELECT preco_gasolina, consumo_km_l FROM settings WHERE user_id=?", (int(current_user.id),))
     config = cursor.fetchone()
     conn.close()
@@ -842,7 +917,7 @@ def api_update_recharge(recarga_id):
     errors = {}
     for f in required_fields:
         if f not in data or str(data[f]).strip() == '':
-            errors[f] = 'Campo obrigatório'
+            errors[f] = _('Campo obrigatório')
     if errors:
         return jsonify({'error': 'validation_failed', 'fields': errors}), 400
 
@@ -850,9 +925,9 @@ def api_update_recharge(recarga_id):
         kwh = float(data['kwh'])
         custo = float(data['custo'])
         odometro = float(data['odometro'])
-        if kwh <= 0: errors['kwh'] = 'Deve ser > 0'
-        if custo < 0: errors['custo'] = 'Não pode ser negativo'
-        if odometro <= 0: errors['odometro'] = 'Deve ser > 0'
+        if kwh <= 0: errors['kwh'] = _('Deve ser > 0')
+        if custo < 0: errors['custo'] = _('Não pode ser negativo')
+        if odometro <= 0: errors['odometro'] = _('Deve ser > 0')
     except ValueError:
         return jsonify({'error': 'invalid_number_format'}), 400
 
@@ -1044,7 +1119,7 @@ def contact():
         conn.close()
 
         # Simula envio bem-sucedido
-        flash('Mensagem enviada com sucesso!')
+        flash(_('Mensagem enviada com sucesso!'))
 
         # Redireciona para evitar reenvio do formulário ao atualizar a página
         return redirect(url_for('contact'))
@@ -1054,12 +1129,10 @@ def contact():
 
 
 
-
-
 # ----------------- RODA APLICACAO -----------------
 if __name__ == "__main__":
-    #app.run(debug=True)
-    app.run(host="0.0.0.0", port=5000)
+    app.run(debug=True)
+    #app.run(host="0.0.0.0", port=5000)
 
 
 

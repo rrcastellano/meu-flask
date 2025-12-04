@@ -1,7 +1,9 @@
 EVChargeLog.com/
 │
 ├── app.py                          # Código base Flask com autenticação inicial
-├── dados.db                        # Banco SQLite com tabelas users, recharges, settings
+├── babel.cfg                       # Configurações do Flask-babel
+├── dados em branco.db              # Banco SQLite com tabelas users, recharges, settings, sem conteúdo
+├── dados.db                        # Banco SQLite com tabelas users, recharges, settings, com conteúdo
 ├── estrutura.txt                   # Esse arquivo, com informações da estrutura do site
 ├── Procfile                        # web: gunicorn app:app
 ├── requirements.txt                # Dependências (Flask, Flask-Login, Werkzeug, WTForms, email-validator, gunicorn)
@@ -12,7 +14,6 @@ EVChargeLog.com/
 │   ├── styles.css                  # Estilos básicos
 │   ├── styles-dark.css             # Novo estilo, vamos migrar para esse
 │   ├── manage_recharges.js         # Javascript para histórico das tabelas no manage_recharges.html
-│   ├── styles-dark.css             # Novo estilo, vamos migrar para esse
 │   │
 │   └── img/
 │       │
@@ -26,18 +27,35 @@ EVChargeLog.com/
 │       ├── logo.svg                # Logo em SVG
 │       └── favicon.ico             # Logo em ícone
 │
-└── templates/
+├── templates/
+│   │
+│   ├── account.html                # Configurações da conta
+│   ├── bulk_recharge.html          # Importação Recargas formato CSV
+│   ├── contact.html                # Página para entrar em Contato    
+│   ├── dashboard.html              # Página Principal com Visualização dos Dados
+│   ├── index.html                  # Página de Login
+│   ├── layout.html                 # Estrutura Padrão de todas as Páginas
+│   ├── recharge.html               # Cadastro de uma Recarga
+│   ├── register.html               # Registro de Usuário
+│   ├── manage_recharges.html       # Editar todas as Recargas
+│   │
+│   └── partials/
+│       │
+│       └── dashboard_charts.js     # Javascript para geração dos charts no dashboard.html
+│
+└── translations/locales/
     │
-    ├── account.html                # Configurações da conta
-    ├── bulk_recharge.html          # Importação Recargas formato CSV
-    ├── contact.html                # Página para entrar em Contato    
-    ├── dashboard.html              # Página Principal com Visualização dos Dados
-    ├── index.html                  # Página de Login
-    ├── layout.html                 # Estrutura Padrão de todas as Páginas
-    ├── recharge.html               # Cadastro de uma Recarga
-    ├── register.html               # Registro de Usuário
-    ├── manage_recharges.html       # Editar todas as Recargas
+    ├── en/LC_MESSAGES/
+    │   │
+    │   ├── messages.mo             # Campos traduzidos em Inglês arquivo binário
+    │   └── messages.po             # Campos traduzidos em Inglês arquivo texto
     │
-    └── partials/
+    ├── es/LC_MESSAGES/
+    │   │
+    │   ├── messages.mo             # Campos traduzidos em Espanhol arquivo binário
+    │   └── messages.po             # Campos traduzidos em Espanhol arquivo texto
+    │
+    └── pt_BR/LC_MESSAGES/
         │
-        └── dashboard_charts.js     # Javascript para geração dos charts no dashboard.html
+        ├── messages.mo             # Campos traduzidos em Português arquivo binário
+        └── messages.po             # Campos traduzidos em Português arquivo texto
