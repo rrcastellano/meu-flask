@@ -212,7 +212,7 @@ footer {
 /* Adaptação para botões primários do Bootstrap */
 .btn-primary {
     background-color: var(--darkgreen-primary);
-    border-color: var(--darkgreen-primary;
+    border-color: var(--darkgreen-primary);
 }
 
 .btn:hover {
