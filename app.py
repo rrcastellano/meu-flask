@@ -136,6 +136,29 @@ class ContactForm(FlaskForm):
     submit = SubmitField(_l('Enviar'))
 
 
+# ----------------- FUNÇÃO AUXILIAR PARA DIRECIONAR AS CONFIRGURAÇÕES -----------------
+def has_complete_config(user_id: int) -> bool:
+    """
+    Retorna True se o usuário possui preco_gasolina e consumo_km_l preenchidos,
+    considerando consumo_km_l > 0. Caso contrário, retorna False.
+    """
+    conn = sqlite3.connect("dados.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT preco_gasolina, consumo_km_l
+        FROM settings
+        WHERE user_id=?
+    """, (user_id,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if not row:
+        return False
+    preco_gasolina, consumo_km_l = row
+    # Regra: ambos não nulos e consumo > 0
+    return (preco_gasolina is not None) and (consumo_km_l is not None) and (float(consumo_km_l) > 0)
+
+
 # ----------------- FUNÇÃO AUXILIAR FORMATAR NÚMEROS (AUTO por idioma) -----------------
 def brl(value, digitos=2, com_prefixo=True):
     """
@@ -327,7 +350,10 @@ def login():
             user = User(row[0], row[1], row[2])
             login_user(user)
             flash(_("Login realizado com sucesso!"), "success")
-            return redirect(url_for("dashboard"))
+
+            # Decide destino conforme configuração do usuário
+            destino = "dashboard" if has_complete_config(int(user.id)) else "account"
+            return redirect(url_for(destino))
         else:
             flash(_("Credenciais inválidas."), "danger")
             return redirect(url_for("index"))

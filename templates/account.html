@@ -4,16 +4,43 @@
 <form method="POST" action="/account">
   {{ form.hidden_tag() }}
   <div class="mb-3">
-    <label for="preco_gasolina" class="form-label">{{ _("Preço da Gasolina (R$/litro)") }}</label>
-    {{ form.preco_gasolina(class_='form-control', id='preco_gasolina') }}
+    <label for="preco_gasolina">{{ _("Preço da Gasolina (R$/litro)") }}</label>
+    {{ form.preco_gasolina(class_='form-control', id='preco_gasolina', type='number', inputmode='decimal', step='0.01', min='0.01', placeholder='6,18') }}
   </div>
   <div class="mb-3">
-    <label for="consumo_km_l" class="form-label">{{ _("Consumo Médio (km/l)") }}</label>
-    {{ form.consumo_km_l(class_='form-control', id='consumo_km_l') }}
+    <label for="consumo_km_l">{{ _("Consumo Médio (km/l)") }}</label>
+    {{ form.consumo_km_l(class_='form-control', id='consumo_km_l', type='number', inputmode='decimal', step='0.01', min='0.01', placeholder='8,0') }}
   </div>
   <button type="submit" class="btn btn-primary">{{ _("Salvar Configurações") }}</button>
 </form>
+
+
+<script>
+  // Normaliza vírgula -> ponto antes de enviar ao servidor
+  document.getElementById('accountForm').addEventListener('submit', function (e) {
+    const preco = document.getElementById('preco_gasolina');
+    const consumo = document.getElementById('consumo_km_l');
+
+    function normalizeDecimal(input) {
+      if (input && typeof input.value === 'string') {
+        input.value = input.value.trim().replace(',', '.');
+      }
+    }
+
+    normalizeDecimal(preco);
+    normalizeDecimal(consumo);
+
+    // Validação mínima no cliente: precisa ser > 0
+    const p = parseFloat(preco.value);
+    const c = parseFloat(consumo.value);
+    if (isNaN(p) || p <= 0 || isNaN(c) || c <= 0) {
+      e.preventDefault();
+      alert("Preencha valores decimais maiores que 0 para ambos os campos.");
+    }
+  });
+</script>
 {% endblock %}
+
 
 
 
