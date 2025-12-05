@@ -251,13 +251,16 @@ def validate_csv_and_parse(file_storage):
     reader.fieldnames = [(h or "").strip().lower().replace('\ufeff', '') for h in reader.fieldnames]
 
     required_headers = ['data', 'kwh', 'custo', 'isento', 'odometro', 'local', 'observacoes']
+
     missing = [h for h in required_headers if h not in reader.fieldnames]
     if missing:
-        return [], [_(
-            "Cabeçalhos inválidos.",
-            "Esperado: " + ", ".join(required_headers),
-            "Ausentes: " + ", ".join(missing)
-        )]
+        msg = _(
+            "Cabeçalhos inválidos. Esperado: %(expected)s. Ausentes: %(missing)s",
+            expected=", ".join(required_headers),
+            missing=", ".join(missing),
+        )
+        return [], [msg]
+
 
     # --- Processar linhas ---
     line_num = 1
