@@ -43,6 +43,7 @@ EVChargeLog.com/
 ├── dados em branco.db              # SQLite DB (empty template)
 ├── dados.db                        # SQLite DB with sample/content
 ├── estrutura.txt                   # Project structure notes
+├── messages.pot                    # Template for translations
 ├── Procfile                        # web: gunicorn app:app (deployment)
 ├── requirements.txt                # Dependencies (Flask, Flask-Login, Werkzeug, WTForms, email-validator, gunicorn)
 ├── schema.sql                      # Database schema

@@ -5,6 +5,7 @@ EVChargeLog.com/
 ├── dados em branco.db              # Banco SQLite com tabelas users, recharges, settings, sem conteúdo
 ├── dados.db                        # Banco SQLite com tabelas users, recharges, settings, com conteúdo
 ├── estrutura.txt                   # Esse arquivo, com informações da estrutura do site
+├── messages.pot                    # Template para traduções
 ├── Procfile                        # web: gunicorn app:app
 ├── requirements.txt                # Dependências (Flask, Flask-Login, Werkzeug, WTForms, email-validator, gunicorn)
 ├── schema.sql                      # Script SQL do banco de dados
@@ -12,7 +13,6 @@ EVChargeLog.com/
 ├── static/
 │   │
 │   ├── styles.css                  # Estilos básicos
-│   ├── styles-dark.css             # Novo estilo, vamos migrar para esse
 │   ├── manage_recharges.js         # Javascript para histórico das tabelas no manage_recharges.html
 │   │
 │   └── img/
