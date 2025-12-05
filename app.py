@@ -1037,7 +1037,7 @@ def export_recharges():
     # CSV em memória (newline='' evita linhas em branco em alguns ambientes)
     output = io.StringIO(newline='')
     writer = csv.writer(output)
-    writer.writerow(['Data', 'kWh', 'Custo', 'Isento', 'Odômetro', 'Local', 'Observações'])
+    writer.writerow(['data', 'kwh', 'custo', 'isento', 'odometro', 'local', 'observacoes'])
     for data, kwh, custo, isento, odometro, local_val, obs in rows:
         writer.writerow([
             data,

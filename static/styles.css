@@ -291,3 +291,12 @@ footer {
     margin-bottom: 2.5rem; /* aumenta espaço abaixo do título */
     color: var(--black); /* Título da página em preto */
 }
+
+
+/* ======== Flags ======== */
+/* Defina o tamanho e, opcionalmente, o alinhamento vertical para as bandeiras */
+.flag-icon {
+    width: 24px; /* Tamanho desejado */
+    height: auto; /* Mantém a proporção */
+    vertical-align: middle; /* Alinha verticalmente com o texto */
+}

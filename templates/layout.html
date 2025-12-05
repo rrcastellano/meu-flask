@@ -82,14 +82,20 @@
   </div>
 
   <footer class="text-center mt-4 mb-4">
-    <p>&copy; {{ _("2025 Gestão de Recargas") }}</p>
-    <div class="container language-switcher" style="text-align: center; margin-top: 20px; padding-bottom: 20px;">
+  <p>&copy; {{ _("2025 Gestão de Recargas") }}</p>
+  <div class="container language-switcher" style="text-align: center; margin-top: 20px; padding-bottom: 20px;">
     <p>Idioma / Language:
-        <a href="{{ url_for(request.endpoint, lang='pt_BR', **request.view_args) }}">🇧🇷 Português</a> | 
-        <a href="{{ url_for(request.endpoint, lang='en', **request.view_args) }}"></i>🇺🇸 English</a> |
-        <a href="{{ url_for(request.endpoint, lang='es', **request.view_args) }}"></i>🇪🇸 Español</a>
+      <a href="{{ url_for(request.endpoint, lang='pt_BR', **request.view_args) }}">
+        <img src="{{ url_for('static', filename='img/StampBrazilFlag.svg') }}" class="flag-icon" alt="Brazil"> Português
+      </a> | 
+      <a href="{{ url_for(request.endpoint, lang='en', **request.view_args) }}">
+        <img src="{{ url_for('static', filename='img/StampUSAFlag.svg') }}" class="flag-icon" alt="USA"> English
+      </a> |
+      <a href="{{ url_for(request.endpoint, lang='es', **request.view_args) }}">
+        <img src="{{ url_for('static', filename='img/StampSpainFlag.svg') }}" class="flag-icon" alt="Spain"> Español
+      </a>
     </p>
-</div>
+  </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
