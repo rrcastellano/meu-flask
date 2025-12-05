@@ -327,7 +327,7 @@ msgstr "kWh / 100Km"
 
 #: templates/dashboard.html:224
 msgid "Km no mês"
-msgstr "Km no mês"
+msgstr "Km mensuales"
 
 #: templates/dashboard.html:225
 msgid "Km"
@@ -608,3 +608,11 @@ msgstr "E-mail"
 #: app.py:135
 msgid "Mensagem"
 msgstr "Mensaje"
+
+#: app.py:136
+msgid "Enviar"
+msgstr "Enviar"
+
+#: templates/index.html:16
+msgid "Entrar"
+msgstr "Entrar"
