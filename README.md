@@ -64,7 +64,10 @@ EVChargeLog.com/
 │       ├── favicon-256x256.png     # 256x256 icon
 │       ├── logo.png                # PNG logo
 │       ├── logo.svg                # SVG logo
-│       └── favicon.ico             # ICO logo
+│       ├── favicon.ico             # Logo em ícone
+│       ├── StampBrazilFlag.svg     # Brazilian Flag in footer
+│       ├── StampSpainFlag.svg      # Spanish Flag in footer
+│       └── StampUSAFlag.svg        # United States Flag in footer
 │
 ├── templates/
 │   │
