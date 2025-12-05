@@ -59,9 +59,9 @@ async function loadRecharges() {
                 tr.innerHTML = `
                     <td>${item.data}</td>
                     <td>${item.kwh}</td>
-                    <td>R$ ${item.custo.toFixed(2)}</td>
+                    <td>${CurrencySymbolBRL} ${item.custo.toFixed(2)}</td>
                     <td>${item.isento ? YesMessage : NoMessage}</td>
-                    <td>${item.odometro}</td>
+                    <td>${item.odometro.toFixed(0)}</td>
                     <td>${item.local || ''}</td>
                     <td title="${item.observacoes || ''}">${(item.observacoes || '').substring(0, 30)}${item.observacoes && item.observacoes.length > 30 ? '...' : ''}</td>
                     <td>

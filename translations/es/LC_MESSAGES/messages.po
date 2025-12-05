@@ -296,7 +296,7 @@ msgstr "No se pudieron cargar los datos."
 msgid "Sem dados para exibir."
 msgstr "Sin datos para mostrar."
 
-#: templates/dashboard.html:213
+#: templates/dashboard.html:213 templates/manage_recharges.html:202
 msgid "R$"
 msgstr "$"
 
