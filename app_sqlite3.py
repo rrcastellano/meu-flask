@@ -3,7 +3,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from flask_mail import Mail, Message
 from flask_babel import Babel, gettext as _, lazy_gettext as _l
 from flask_wtf import CSRFProtect, FlaskForm
-import psycopg2
+import sqlite3
 from wtforms import StringField, PasswordField, FloatField, DateField, TextAreaField, FileField, BooleanField, EmailField, SubmitField 
 from wtforms.validators import DataRequired, Email, Length, NumberRange
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -12,19 +12,7 @@ import csv
 import io
 import os
 from collections import defaultdict
-from datetime import datetime, date
-
-# --- Helper para normalizar datas vindas do Postgres/strings ---
-def _to_month(value):
-    try:
-        from datetime import datetime, date
-        if isinstance(value, (datetime, date)):
-            return value.strftime("%Y-%m")
-        return datetime.fromisoformat(str(value)).strftime("%Y-%m")
-    except Exception:
-        return str(value)[:7]
-
-
+from datetime import datetime
 
 # ----------------- CONFIGURAÇÕES INICIAIS DO FLASK -----------------
 app = Flask(__name__)
@@ -95,9 +83,9 @@ class User(UserMixin):
 
 @login_manager.user_loader
 def load_user(user_id):
-    conn = psycopg2.connect(os.getenv('DATABASE_URL'))
+    conn = sqlite3.connect("dados.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT id, nome, email FROM users WHERE id=%s", (user_id,))
+    cursor.execute("SELECT id, nome, email FROM users WHERE id=?", (user_id,))
     row = cursor.fetchone()
     conn.close()
     if row:
@@ -154,12 +142,12 @@ def has_complete_config(user_id: int) -> bool:
     Retorna True se o usuário possui preco_gasolina e consumo_km_l preenchidos,
     considerando consumo_km_l > 0. Caso contrário, retorna False.
     """
-    conn = psycopg2.connect(os.getenv('DATABASE_URL'))
+    conn = sqlite3.connect("dados.db")
     cursor = conn.cursor()
     cursor.execute("""
         SELECT preco_gasolina, consumo_km_l
         FROM settings
-        WHERE user_id=%s
+        WHERE user_id=?
     """, (user_id,))
     row = cursor.fetchone()
     conn.close()
@@ -192,7 +180,7 @@ def brl(value, digitos=2, com_prefixo=True):
     try:
         # get_locale foi definido no seu app e passado ao Babel como locale_selector
         lang = None
-        # 1) sessão (se você troca via %slang=)
+        # 1) sessão (se você troca via ?lang=)
         lang = session.get('lang')
         # 2) Babel (selector)
         if not lang:
@@ -353,9 +341,9 @@ def login():
     if form.validate_on_submit():
         email = form.email.data
         senha = form.senha.data
-        conn = psycopg2.connect(os.getenv('DATABASE_URL'))
+        conn = sqlite3.connect("dados.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT id, nome, email, senha_hash FROM users WHERE email=%s", (email,))
+        cursor.execute("SELECT id, nome, email, senha_hash FROM users WHERE email=?", (email,))
         row = cursor.fetchone()
         conn.close()
         if row and check_password_hash(row[3], senha):
@@ -382,10 +370,10 @@ def register():
             nome = form.nome.data
             email = form.email.data
             senha_hash = generate_password_hash(form.senha.data)
-            conn = psycopg2.connect(os.getenv('DATABASE_URL'))
+            conn = sqlite3.connect("dados.db")
             cursor = conn.cursor()
             try:
-                cursor.execute("INSERT INTO users (nome, email, senha_hash) VALUES (%s, %s, %s)", (nome, email, senha_hash))
+                cursor.execute("INSERT INTO users (nome, email, senha_hash) VALUES (?, ?, ?)", (nome, email, senha_hash))
                 conn.commit()
                 flash(_("Conta criada com sucesso! Faça login."), "success")
                 return redirect(url_for("index"))
@@ -419,11 +407,11 @@ def recharge():
             local = form.local.data
             observacoes = form.observacoes.data
             isento = 1 if form.isento.data else 0
-            conn = psycopg2.connect(os.getenv('DATABASE_URL'))
+            conn = sqlite3.connect("dados.db")
             cursor = conn.cursor()
             cursor.execute("""
                 INSERT INTO recharges (user_id, data, kwh, custo, isento, odometro, local, observacoes)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, (int(current_user.id), data, kwh, custo, isento, odometro, local, observacoes))
             conn.commit()
             conn.close()
@@ -452,14 +440,14 @@ def bulk_recharge():
             return redirect(url_for("bulk_recharge"))
 
         # Inserção no banco
-        conn = psycopg2.connect(os.getenv('DATABASE_URL'))
+        conn = sqlite3.connect("dados.db")
         cursor = conn.cursor()
         count_ok = 0
         for r in rows:
             try:
                 cursor.execute("""
                     INSERT INTO recharges (user_id, data, kwh, custo, isento, odometro, local, observacoes)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     int(current_user.id),
                     r['data'],
@@ -492,19 +480,19 @@ def bulk_recharge():
 @login_required
 def account():
     form = AccountForm()
-    conn = psycopg2.connect(os.getenv('DATABASE_URL'))
+    conn = sqlite3.connect("dados.db")
     cursor = conn.cursor()
     if request.method == "POST":
         if form.validate_on_submit():
             preco_gasolina = form.preco_gasolina.data
             consumo_km_l = form.consumo_km_l.data
-            cursor.execute("SELECT id FROM settings WHERE user_id=%s", (int(current_user.id),))
+            cursor.execute("SELECT id FROM settings WHERE user_id=?", (int(current_user.id),))
             row = cursor.fetchone()
             if row:
-                cursor.execute("UPDATE settings SET preco_gasolina=%s, consumo_km_l=%s WHERE user_id=%s",
+                cursor.execute("UPDATE settings SET preco_gasolina=?, consumo_km_l=? WHERE user_id=?",
                                (preco_gasolina, consumo_km_l, int(current_user.id)))
             else:
-                cursor.execute("INSERT INTO settings (user_id, preco_gasolina, consumo_km_l) VALUES (%s, %s, %s)",
+                cursor.execute("INSERT INTO settings (user_id, preco_gasolina, consumo_km_l) VALUES (?, ?, ?)",
                                (int(current_user.id), preco_gasolina, consumo_km_l))
             conn.commit()
             conn.close()
@@ -514,7 +502,7 @@ def account():
             for field, errors in form.errors.items():
                 for err in errors:
                     flash(_(f"Erro em {field}: {err}"), "danger")
-    cursor.execute("SELECT preco_gasolina, consumo_km_l FROM settings WHERE user_id=%s", (int(current_user.id),))
+    cursor.execute("SELECT preco_gasolina, consumo_km_l FROM settings WHERE user_id=?", (int(current_user.id),))
     config = cursor.fetchone()
     conn.close()
     if config:
@@ -528,9 +516,9 @@ def account():
 @login_required
 def api_recharges():
     user_id = int(current_user.id)
-    conn = psycopg2.connect(os.getenv('DATABASE_URL'))
+    conn = sqlite3.connect("dados.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT data, kwh, custo, isento FROM recharges WHERE user_id=%s ORDER BY data", (user_id,))
+    cursor.execute("SELECT data, kwh, custo, isento FROM recharges WHERE user_id=? ORDER BY data", (user_id,))
     rows = cursor.fetchall()
     conn.close()
     labels = [r[0] for r in rows]
@@ -546,18 +534,18 @@ def api_recharges_monthly():
     user_id = int(current_user.id)
 
     # Buscar dados do usuário
-    conn = psycopg2.connect(os.getenv('DATABASE_URL'))
+    conn = sqlite3.connect("dados.db")
     cursor = conn.cursor()
     cursor.execute("""
         SELECT data, kwh, custo, isento, odometro
         FROM recharges
-        WHERE user_id=%s
-        ORDER BY CAST(data AS date), id
+        WHERE user_id=?
+        ORDER BY date(data), id
     """, (user_id,))
     rows = cursor.fetchall()
 
     # Buscar configurações para cálculo de economia
-    cursor.execute("SELECT preco_gasolina, consumo_km_l FROM settings WHERE user_id=%s", (user_id,))
+    cursor.execute("SELECT preco_gasolina, consumo_km_l FROM settings WHERE user_id=?", (user_id,))
     config = cursor.fetchone()
     conn.close()
 
@@ -576,7 +564,7 @@ def api_recharges_monthly():
     # Processar linhas
     for data, kwh, custo, isento, odometro in rows:
         try:
-            mes = _to_month(data)  # 'YYYY-MM'
+            mes = datetime.fromisoformat(data).strftime("%Y-%m")  # 'YYYY-MM'
         except Exception:
             mes = str(data)[:7]
 
@@ -677,17 +665,17 @@ def dashboard():
     user_id = int(current_user.id)
 
     # Carregar dados
-    conn = psycopg2.connect(os.getenv('DATABASE_URL'))
+    conn = sqlite3.connect("dados.db")
     cursor = conn.cursor()
     cursor.execute("""
         SELECT id, data, kwh, custo, isento, odometro, local, observacoes
         FROM recharges
-        WHERE user_id=%s
-        ORDER BY CAST(data AS date), id
+        WHERE user_id=?
+        ORDER BY date(data), id
     """, (user_id,))
     recargas = cursor.fetchall()
 
-    cursor.execute("SELECT preco_gasolina, consumo_km_l FROM settings WHERE user_id=%s", (user_id,))
+    cursor.execute("SELECT preco_gasolina, consumo_km_l FROM settings WHERE user_id=?", (user_id,))
     config = cursor.fetchone()
     conn.close()
 
@@ -757,7 +745,7 @@ def dashboard():
                                    "custo_total": 0, "custo_pagamento": 0, "kwh": 0, "odometros": []})
 
     for (_id, data, kwh, custo, isento, odometro, *_rest) in recargas:
-        mes = _to_month(data)
+        mes = datetime.fromisoformat(data).strftime("%Y-%m")
         monthly[mes]["count_total"] += 1
         monthly[mes]["custo_total"] += float(custo or 0)
         monthly[mes]["kwh"] += float(kwh or 0)
@@ -889,26 +877,26 @@ def api_manage_recharges():
     sort_dir = 'desc' if sort_dir == 'desc' else 'asc'
 
     user_id = int(current_user.id)
-    conn = psycopg2.connect(os.getenv('DATABASE_URL'))
+    conn = sqlite3.connect('dados.db')
     cursor = conn.cursor()
 
     # Monta cláusula WHERE
-    where_clauses = ['user_id=%s']
+    where_clauses = ['user_id=?']
     params = [user_id]
     if local:
-        where_clauses.append('LOWER(local) LIKE %s')
+        where_clauses.append('LOWER(local) LIKE ?')
         params.append(f'%{local.lower()}%')
     if observacoes:
-        where_clauses.append('LOWER(observacoes) LIKE %s')
+        where_clauses.append('LOWER(observacoes) LIKE ?')
         params.append(f'%{observacoes.lower()}%')
     if isento in ['true', 'false']:
-        where_clauses.append('isento=%s')
+        where_clauses.append('isento=?')
         params.append(1 if isento == 'true' else 0)
     if date_from:
-        where_clauses.append('CAST(data AS date) >= date(%s)')
+        where_clauses.append('date(data) >= date(?)')
         params.append(date_from)
     if date_to:
-        where_clauses.append('CAST(data AS date) <= date(%s)')
+        where_clauses.append('date(data) <= date(?)')
         params.append(date_to)
 
     where_sql = ' AND '.join(where_clauses)
@@ -923,7 +911,7 @@ def api_manage_recharges():
         SELECT id, data, kwh, custo, isento, odometro, local, observacoes
         FROM recharges WHERE {where_sql}
         ORDER BY {sort_by} {sort_dir}
-        LIMIT %s OFFSET %s
+        LIMIT ? OFFSET ?
     ''', params + [page_size, offset])
     rows = cursor.fetchall()
     conn.close()
@@ -976,9 +964,9 @@ def api_update_recharge(recarga_id):
         return jsonify({'error': 'validation_failed', 'fields': errors}), 400
 
     # Atualiza no banco
-    conn = psycopg2.connect(os.getenv('DATABASE_URL'))
+    conn = sqlite3.connect('dados.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT user_id FROM recharges WHERE id=%s', (recarga_id,))
+    cursor.execute('SELECT user_id FROM recharges WHERE id=?', (recarga_id,))
     row = cursor.fetchone()
     if not row:
         conn.close()
@@ -988,14 +976,14 @@ def api_update_recharge(recarga_id):
         return jsonify({'error': 'forbidden'}), 403
 
     cursor.execute('''
-        UPDATE recharges SET data=%s, kwh=%s, custo=%s, isento=%s, odometro=%s, local=%s, observacoes=%s WHERE id=%s
+        UPDATE recharges SET data=?, kwh=?, custo=?, isento=?, odometro=?, local=?, observacoes=? WHERE id=?
     ''', (
         data['data'], kwh, custo, 1 if data.get('isento') else 0,
         odometro, data.get('local', ''), data.get('observacoes', ''), recarga_id
     ))
     conn.commit()
 
-    cursor.execute('SELECT id, data, kwh, custo, isento, odometro, local, observacoes FROM recharges WHERE id=%s', (recarga_id,))
+    cursor.execute('SELECT id, data, kwh, custo, isento, odometro, local, observacoes FROM recharges WHERE id=?', (recarga_id,))
     r = cursor.fetchone()
     conn.close()
 
@@ -1009,9 +997,9 @@ def api_update_recharge(recarga_id):
 @login_required
 @csrf.exempt
 def api_delete_recharge(recarga_id):
-    conn = psycopg2.connect(os.getenv('DATABASE_URL'))
+    conn = sqlite3.connect('dados.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT user_id FROM recharges WHERE id=%s', (recarga_id,))
+    cursor.execute('SELECT user_id FROM recharges WHERE id=?', (recarga_id,))
     row = cursor.fetchone()
     if not row:
         conn.close()
@@ -1020,7 +1008,7 @@ def api_delete_recharge(recarga_id):
         conn.close()
         return jsonify({'error': 'forbidden'}), 403
 
-    cursor.execute('DELETE FROM recharges WHERE id=%s', (recarga_id,))
+    cursor.execute('DELETE FROM recharges WHERE id=?', (recarga_id,))
     conn.commit()
     conn.close()
     return jsonify({'deleted': True})
@@ -1039,26 +1027,26 @@ def export_recharges():
     date_to = request.args.get('date_to')
 
     user_id = int(current_user.id)
-    conn = psycopg2.connect(os.getenv('DATABASE_URL'))
+    conn = sqlite3.connect('dados.db')
     cursor = conn.cursor()
 
     # WHERE
-    where_clauses = ['user_id=%s']
+    where_clauses = ['user_id=?']
     params = [user_id]
     if local:
-        where_clauses.append('LOWER(local) LIKE %s')
+        where_clauses.append('LOWER(local) LIKE ?')
         params.append(f'%{local.lower()}%')
     if observacoes:
-        where_clauses.append('LOWER(observacoes) LIKE %s')
+        where_clauses.append('LOWER(observacoes) LIKE ?')
         params.append(f'%{observacoes.lower()}%')
     if isento in ['true', 'false']:
-        where_clauses.append('isento=%s')
+        where_clauses.append('isento=?')
         params.append(1 if isento == 'true' else 0)
     if date_from:
-        where_clauses.append('CAST(data AS date) >= date(%s)')  # ✅ sem entidades HTML
+        where_clauses.append('date(data) >= date(?)')  # ✅ sem entidades HTML
         params.append(date_from)
     if date_to:
-        where_clauses.append('CAST(data AS date) <= date(%s)')  # ✅ sem entidades HTML
+        where_clauses.append('date(data) <= date(?)')  # ✅ sem entidades HTML
         params.append(date_to)
 
     where_sql = ' AND '.join(where_clauses)
@@ -1067,7 +1055,7 @@ def export_recharges():
         SELECT data, kwh, custo, isento, odometro, local, observacoes
         FROM recharges
         WHERE {where_sql}
-        ORDER BY CAST(data AS date), id
+        ORDER BY date(data), id
     ''', params)
     rows = cursor.fetchall()
     conn.close()
@@ -1145,7 +1133,7 @@ def contact():
         '''
         
         # Log no SQLite
-        conn = psycopg2.connect(os.getenv('DATABASE_URL'))
+        conn = sqlite3.connect('dados.db')
         cursor = conn.cursor()
         
         # --- Usar isoformat() para o tipo TIMESTAMP no SQLITE ---
@@ -1153,7 +1141,7 @@ def contact():
 
         cursor.execute('''
             INSERT INTO contact_logs (nome, email, mensagem, data_envio, status)
-            VALUES (%s, %s, %s, %s, %s)
+            VALUES (?, ?, ?, ?, ?)
         ''', (nome, email, mensagem, data_envio, status))
         
         conn.commit()
