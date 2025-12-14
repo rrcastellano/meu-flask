@@ -5,6 +5,14 @@ let sortBy = 'data';
 let sortDir = 'asc';
 const pageSize = 20;
 
+// ==================== Utilitário de Data ====================
+function formatDateYMD(value) {
+    if (!value) return '';
+    const d = new Date(value);
+    if (isNaN(d)) return value;
+    return d.toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
 // ==================== Função para exibir Toast ====================
 function showToast(message, type = 'success') {
     const toastContainer = document.getElementById('toast-container');
@@ -57,7 +65,7 @@ async function loadRecharges() {
                 const tr = document.createElement('tr');
                 tr.dataset.id = item.id;
                 tr.innerHTML = `
-                    <td>${item.data}</td>
+                    <td>${formatDateYMD(item.data)}</td>
                     <td>${item.kwh}</td>
                     <td>${CurrencySymbolBRL} ${item.custo.toFixed(2)}</td>
                     <td>${item.isento ? YesMessage : NoMessage}</td>
@@ -136,9 +144,9 @@ document.getElementById('recharges-body').addEventListener('click', (e) => {
         const tr = e.target.closest('tr');
         const id = tr.dataset.id;
         document.getElementById('edit-id').value = id;
-        document.getElementById('edit-data').value = tr.children[0].textContent;
+        document.getElementById('edit-data').value = formatDateYMD(tr.children[0].textContent);
         document.getElementById('edit-kwh').value = tr.children[1].textContent;
-        document.getElementById('edit-custo').value = tr.children[2].textContent.replace('R$ ', '');
+        document.getElementById('edit-custo').value = tr.children[2].textContent.replace(/[^\d.,]/g, '').replace(',', '.');
         document.getElementById('edit-isento').checked = tr.children[3].textContent === 'Sim';
         document.getElementById('edit-odometro').value = tr.children[4].textContent;
         document.getElementById('edit-local').value = tr.children[5].textContent;
