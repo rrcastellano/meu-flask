@@ -418,7 +418,7 @@ def recharge():
             odometro = form.odometro.data
             local = form.local.data
             observacoes = form.observacoes.data
-            isento = 1 if form.isento.data else 0
+            isento = bool(form.isento.data)
             conn = psycopg2.connect(os.getenv('DATABASE_URL'))
             cursor = conn.cursor()
             cursor.execute("""
@@ -903,7 +903,7 @@ def api_manage_recharges():
         params.append(f'%{observacoes.lower()}%')
     if isento in ['true', 'false']:
         where_clauses.append('isento=%s')
-        params.append(1 if isento == 'true' else 0)
+        params.append(isento == 'true')
     if date_from:
         where_clauses.append('CAST(data AS date) >= date(%s)')
         params.append(date_from)
@@ -990,7 +990,7 @@ def api_update_recharge(recarga_id):
     cursor.execute('''
         UPDATE recharges SET data=%s, kwh=%s, custo=%s, isento=%s, odometro=%s, local=%s, observacoes=%s WHERE id=%s
     ''', (
-        data['data'], kwh, custo, 1 if data.get('isento') else 0,
+        data['data'], kwh, custo, data.get('isento', False),
         odometro, data.get('local', ''), data.get('observacoes', ''), recarga_id
     ))
     conn.commit()
