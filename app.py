@@ -4,7 +4,7 @@ from flask_mail import Mail, Message
 from flask_babel import Babel, gettext as _, lazy_gettext as _l
 from flask_wtf import CSRFProtect, FlaskForm
 import psycopg2
-from wtforms import StringField, PasswordField, FloatField, DateField, TextAreaField, FileField, BooleanField, EmailField, SubmitField 
+from wtforms import StringField, PasswordField, FloatField, DateField, TextAreaField, FileField, BooleanField, EmailField, SubmitField, DecimalField 
 from wtforms.validators import DataRequired, Email, Length, NumberRange
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -121,10 +121,10 @@ class RegisterForm(FlaskForm):
 class RechargeForm(FlaskForm):
     # Rótulos marcados para tradução
     data = DateField(_l("Data"), validators=[DataRequired()])
-    kwh = FloatField(_l("kWh"), validators=[DataRequired(), NumberRange(min=0.01)])
-    custo = FloatField(_l("Custo"), validators=[DataRequired(), NumberRange(min=0.0)])
+    kwh = DecimalField(_l("kWh"), places=2, rounding=None, validators=[DataRequired(), NumberRange(min=0.01)])
+    custo = DecimalField(_l("Custo"), places=2, rounding=None, validators=[DataRequired(), NumberRange(min=0.0)])
     isento = BooleanField(_l("Isento"))
-    odometro = FloatField(_l("Odômetro"), validators=[DataRequired(), NumberRange(min=0.1)])
+    odometro = DecimalField(_l("Odômetro"), validators=[DataRequired(), NumberRange(min=0.1)])
     local = StringField(_l("Local"))
     observacoes = TextAreaField(_l("Observações"))
     submit = SubmitField(_l("Salvar Recarga")) # Adicionei um botão de submit

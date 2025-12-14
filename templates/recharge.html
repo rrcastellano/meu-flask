@@ -9,15 +9,19 @@
   </div>
   <div class="mb-3">
     <label for="kwh" class="form-label">{{ _("kWh Carregados") }}</label>
-    {{ form.kwh(class_='form-control', id='kwh') }}
+    {{ form.kwh(class_='form-control', id='kwh', type='number', step='0.01', min='0.01') }}
   </div>
   <div class="mb-3">
     <label for="custo" class="form-label">{{ _("Custo (R$)") }}</label>
-    {{ form.custo(class_='form-control', id='custo') }}
+    {{ form.custo(class_='form-control', id='custo', type='number', step='0.01', min='0') }}
   </div>
+  <div class="form-check mb-3">
+    {{ form.isento(class_='form-check-input', id='isento') }}
+    {{ form.isento.label(class_='form-check-label', for='isento') }}
+</div>
   <div class="mb-3">
     <label for="odometro" class="form-label">{{ _("Odômetro (km)") }}</label>
-    {{ form.odometro(class_='form-control', id='odometro') }}
+    {{ form.odometro(class_='form-control', id='odometro', type='number', min='0') }}
   </div>
   <div class="mb-3">
     <label for="local" class="form-label">{{ _("Local") }}</label>
