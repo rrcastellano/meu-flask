@@ -12,7 +12,7 @@ import csv
 import io
 import os
 from collections import defaultdict
-from datetime import datetime, date
+from datetime import datetime, timezone, date
 
 # --- Helper para normalizar datas vindas do Postgres/strings ---
 def _to_month(value):
@@ -412,7 +412,7 @@ def recharge():
     form = RechargeForm()
     if request.method == "POST":
         if form.validate_on_submit():
-            data = form.data.data.isoformat()
+            data = form.data.data
             kwh = form.kwh.data
             custo = form.custo.data
             odometro = form.odometro.data
@@ -1149,7 +1149,10 @@ def contact():
         cursor = conn.cursor()
         
         # --- Usar isoformat() para o tipo TIMESTAMP no SQLITE ---
-        data_envio = datetime.now().isoformat() 
+        # data_envio = datetime.now().isoformat() 
+
+        # --- Usar isoformat() para o tipo TIMESTAMP no POSTGRES ---
+        data_envio = datetime.now(timezone.utc)
 
         cursor.execute('''
             INSERT INTO contact_logs (nome, email, mensagem, data_envio, status)
