@@ -1,0 +1,15 @@
+# Django standard ignores
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+db.sqlite3
+.env
+.venv
+venv/
+ENV/
+staticfiles/
+
+# OS generated files
+.DS_Store
+Thumbs.db
